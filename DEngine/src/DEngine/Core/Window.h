@@ -8,8 +8,8 @@ namespace DEngine
 		std::wstring WNDNAME;
 		unsigned int width, height;
 	public:
-		Window(std::wstring windowName, unsigned int width, unsigned int height);
-		~Window();
+		Window(std::wstring windowName, unsigned int _width, unsigned int _height);
+		~Window() = default;
 	};
 }
 
