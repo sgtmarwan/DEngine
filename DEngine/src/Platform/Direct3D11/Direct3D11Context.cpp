@@ -1,0 +1,162 @@
+#include "Direct3D11Context.h"
+namespace DEngine
+{
+
+	Direct3D11Context::Direct3D11Context(const HWND& hWnd, unsigned short backBufferCount, unsigned short vsync) :
+		GraphicsContext(backBufferCount, vsync)
+	{
+		CreateDeviceAndContext(D3D_DRIVER_TYPE_HARDWARE);
+		CreateSwapChain(hWnd);
+	}
+
+	Direct3D11Context::~Direct3D11Context()
+	{
+		if (depthStencilTexture != nullptr) depthStencilTexture->Release();
+		if (depthStencilState != nullptr) depthStencilState->Release();
+		if (rasterizerState != nullptr) rasterizerState->Release();
+		if (depthStencilView != nullptr) depthStencilView->Release();
+		if (renderTargetView != nullptr) renderTargetView->Release();
+		if (swapChain != nullptr) swapChain->Release();
+		if (deviceContext != nullptr) deviceContext->Release();
+		if (device != nullptr) device->Release();
+	}
+
+	void Direct3D11Context::ChangeRes(unsigned int width, unsigned int height)
+	{
+		DXGI_MODE_DESC dmd = {};
+		dmd.Width = width;
+		dmd.Height = height;
+		dmd.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		dmd.RefreshRate.Numerator = 60;
+		dmd.RefreshRate.Denominator = 1;
+		dmd.Scaling = DXGI_MODE_SCALING_CENTERED;
+		dmd.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		swapChain->ResizeTarget(&dmd);
+	}
+
+	void Direct3D11Context::Resize(unsigned int width, unsigned int height)
+	{
+		ID3D11Texture2D* bf = nullptr;
+		if (renderTargetView != nullptr)
+			renderTargetView->Release();
+		if (depthStencilView != nullptr)
+			depthStencilView->Release();
+		swapChain->ResizeBuffers(BackBufferCount, width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+		swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&bf));
+		device->CreateRenderTargetView1(bf, nullptr, &renderTargetView);
+		bf->Release();
+		D3D11_TEXTURE2D_DESC depthStencilBufferDesc = {};
+		depthStencilBufferDesc.ArraySize = 1;
+		depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		depthStencilBufferDesc.CPUAccessFlags = 0;
+		depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthStencilBufferDesc.Width = width;
+		depthStencilBufferDesc.Height = height;
+		depthStencilBufferDesc.MipLevels = 1;
+		depthStencilBufferDesc.SampleDesc.Count = 1;
+		depthStencilBufferDesc.SampleDesc.Quality = 0;
+		depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		if (depthStencilTexture != nullptr)
+			depthStencilTexture->Release();
+		D3D11_DEPTH_STENCIL_VIEW_DESC dsvd = {};
+		device->CreateTexture2D(&depthStencilBufferDesc, nullptr, &depthStencilTexture);
+		device->CreateDepthStencilView(depthStencilTexture, &dsvd, &depthStencilView);
+		SetViewport((float)width, (float)height);
+		deviceContext->OMSetRenderTargets(1, (ID3D11RenderTargetView**) & renderTargetView, depthStencilView);
+	}
+	void Direct3D11Context::PresentFrame()
+	{
+		swapChain->Present1(Vsync, 0u, &presentParameters);
+		deviceContext->OMSetRenderTargets(1, (ID3D11RenderTargetView**)&renderTargetView, depthStencilView);
+		CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
+	}
+	ID3D11Device5* Direct3D11Context::GetDevice()
+	{
+		return device;
+	}
+	ID3D11DeviceContext4* Direct3D11Context::GetDeviceContext()
+	{
+		return deviceContext;
+	}
+	void Direct3D11Context::CreateDeviceAndContext(D3D_DRIVER_TYPE driverType)
+	{
+		ID3D11Device* d;
+		ID3D11DeviceContext* dc;
+		D3D11CreateDevice(0, driverType, 0, 0, nullptr, 0, D3D11_SDK_VERSION, &d, nullptr, &dc);
+		d->QueryInterface<ID3D11Device5>(&device);
+		dc->QueryInterface<ID3D11DeviceContext4>(&deviceContext);
+		d->Release();
+		dc->Release();
+	}
+	void Direct3D11Context::CreateSwapChain(const HWND& hwnd)
+	{
+		IDXGIFactory4* factory;
+		CreateDXGIFactory2(0, __uuidof(IDXGIFactory4), (void**)&factory);
+		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+		swapChainDesc.Width = 0;
+		swapChainDesc.Height = 0;
+		swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		swapChainDesc.Stereo = FALSE;
+		swapChainDesc.SampleDesc = { 1, 0 };
+		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapChainDesc.BufferCount = BackBufferCount;
+		swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+		swapChainDesc.Flags = 0;
+		IDXGISwapChain1* swapChain1;
+		factory->CreateSwapChainForHwnd(
+			device,
+			hwnd,
+			&swapChainDesc,
+			nullptr,
+			nullptr,
+			&swapChain1);
+		swapChain1->QueryInterface<IDXGISwapChain4>(&swapChain);
+		swapChain1->Release();
+		factory->Release();
+	}
+	void Direct3D11Context::SetOMStates()
+	{
+		D3D11_RASTERIZER_DESC2 rasterizerDesc = {};
+
+		rasterizerDesc.AntialiasedLineEnable = FALSE;
+		rasterizerDesc.CullMode = D3D11_CULL_BACK;
+		rasterizerDesc.DepthBias = 0;
+		rasterizerDesc.DepthBiasClamp = 0.0f;
+		rasterizerDesc.DepthClipEnable = TRUE;
+		rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+		rasterizerDesc.FrontCounterClockwise = FALSE;
+		rasterizerDesc.MultisampleEnable = FALSE;
+		rasterizerDesc.ScissorEnable = FALSE;
+		rasterizerDesc.SlopeScaledDepthBias = 0.0f;
+		rasterizerDesc.ConservativeRaster = D3D11_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+		rasterizerDesc.ForcedSampleCount = 0;
+
+		device->CreateRasterizerState2(&rasterizerDesc, &rasterizerState);
+
+		deviceContext->RSSetState(rasterizerState);
+
+
+		D3D11_DEPTH_STENCIL_DESC depthStencilStateDesc = {};
+
+		depthStencilStateDesc.DepthEnable = TRUE;
+		depthStencilStateDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		depthStencilStateDesc.DepthFunc = D3D11_COMPARISON_LESS;
+		depthStencilStateDesc.StencilEnable = FALSE;
+
+		device->CreateDepthStencilState(&depthStencilStateDesc, &depthStencilState);
+
+		deviceContext->OMSetDepthStencilState(depthStencilState, 1);
+	}
+	void Direct3D11Context::SetViewport(float width, float height)
+	{
+		viewport.Width = width;
+		viewport.Height = height;
+		viewport.TopLeftX = 0.0f;
+		viewport.TopLeftY = 0.0f;
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+		deviceContext->RSSetViewports(1, &viewport);
+	}
+}

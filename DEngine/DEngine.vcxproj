@@ -144,12 +144,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Platform\Direct3D11\D3D11GraphicsFactory.h" />
+    <ClInclude Include="src\Platform\Direct3D11\D3D11ShaderManager.h" />
+    <ClInclude Include="src\DEngine\Graphics\GraphicsFactory.h" />
+    <ClInclude Include="src\DEngine\Graphics\ShaderManager.h" />
+    <ClInclude Include="src\Platform\Direct3D11\D3D11Shader.h" />
+    <ClInclude Include="src\DEngine\Graphics\INPUT_LAYOUT.h" />
+    <ClInclude Include="src\DEngine\Graphics\Shader.h" />
+    <ClInclude Include="src\Platform\Direct3D11\Direct3D11Context.h" />
+    <ClInclude Include="src\DEngine\Graphics\GraphicsContext.h" />
     <ClInclude Include="include\DEngineAPI.h" />
     <ClInclude Include="src\Platform\Windows\DEW.h" />
     <ClInclude Include="src\Platform\Windows\WinWindow.h" />
     <ClInclude Include="src\DEngine\Core\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Platform\Direct3D11\D3D11GraphicsFactory.cpp" />
+    <ClCompile Include="src\Platform\Direct3D11\D3D11ShaderManager.cpp" />
+    <ClCompile Include="src\DEngine\Graphics\GraphicsFactory.cpp" />
+    <ClCompile Include="src\DEngine\Graphics\ShaderManager.cpp" />
+    <ClCompile Include="src\Platform\Direct3D11\D3D11Shader.cpp" />
+    <ClCompile Include="src\DEngine\Graphics\Shader.cpp" />
+    <ClCompile Include="src\Platform\Direct3D11\Direct3D11Context.cpp" />
+    <ClCompile Include="src\DEngine\Graphics\GraphicsContext.cpp" />
     <ClCompile Include="src\Platform\Windows\WinWindow.cpp" />
     <ClCompile Include="src\DEngine\Core\Window.cpp" />
   </ItemGroup>
