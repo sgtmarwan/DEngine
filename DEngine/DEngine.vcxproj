@@ -145,9 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Platform\Direct3D11\D3D11GraphicsFactory.h" />
-    <ClInclude Include="src\Platform\Direct3D11\D3D11ShaderManager.h" />
     <ClInclude Include="src\DEngine\Graphics\GraphicsFactory.h" />
-    <ClInclude Include="src\DEngine\Graphics\ShaderManager.h" />
     <ClInclude Include="src\Platform\Direct3D11\D3D11Shader.h" />
     <ClInclude Include="src\DEngine\Graphics\INPUT_LAYOUT.h" />
     <ClInclude Include="src\DEngine\Graphics\Shader.h" />
@@ -160,9 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\Direct3D11\D3D11GraphicsFactory.cpp" />
-    <ClCompile Include="src\Platform\Direct3D11\D3D11ShaderManager.cpp" />
     <ClCompile Include="src\DEngine\Graphics\GraphicsFactory.cpp" />
-    <ClCompile Include="src\DEngine\Graphics\ShaderManager.cpp" />
     <ClCompile Include="src\Platform\Direct3D11\D3D11Shader.cpp" />
     <ClCompile Include="src\DEngine\Graphics\Shader.cpp" />
     <ClCompile Include="src\Platform\Direct3D11\Direct3D11Context.cpp" />

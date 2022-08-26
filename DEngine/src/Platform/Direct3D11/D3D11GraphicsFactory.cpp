@@ -4,9 +4,13 @@
 #include "D3D11Shader.h"
 
 DXGI_FORMAT GetInputFormat(DEngine::INPUT_FORMAT format);
+D3D11_USAGE GetUsage(DEngine::DATA_USAGE usage);
+int GetCPUAccessFlags(DEngine::DATA_USAGE usage);
 
 namespace DEngine
 {
+	Direct3D11Context* D3D11GraphicsFactory::graphicsContext = nullptr;
+
 	ID3D11VertexShader* D3D11GraphicsFactory::CreateVertexShader(void** VSSources, size_t* VSSize, unsigned int VSCount, ID3DBlob** vs_blob_out)
 	{
 		ID3D11VertexShader* vs;
@@ -33,6 +37,31 @@ namespace DEngine
 			vs_modules_instance[i]->Release();
 		delete[VSCount] vs_modules_instance;
 		return vs;
+	}
+	ShaderData* D3D11GraphicsFactory::CreateShaderData(void** data, size_t* size, unsigned int count, DATA_USAGE usage)
+	{
+		ID3D11Buffer** buff = new ID3D11Buffer*[count];
+		D3D11ShaderData* shaderData = new D3D11ShaderData;
+		shaderData->DataCount = count;
+		size_t* sizes = new size_t[count];
+		D3D11_BUFFER_DESC bd = {};
+		for (int i = 0; i < count; ++i)
+		{
+			bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+			bd.ByteWidth = size[i];
+			bd.Usage = GetUsage(usage);
+			bd.CPUAccessFlags = GetCPUAccessFlags(usage);
+			bd.MiscFlags = 0;
+			bd.StructureByteStride = 0;
+
+			D3D11_SUBRESOURCE_DATA sd = { data[i], 0, 0};
+			graphicsContext->GetDevice()->CreateBuffer(&bd, &sd, &buff[i]);
+			*sizes = size[i];
+		}
+
+		shaderData->Data = buff;
+		shaderData->Size = sizes;
+		return shaderData;
 	}
 	ID3D11PixelShader* D3D11GraphicsFactory::CreatePixelShader(void** PSSources, size_t* PSSize, unsigned int PSCount)
 	{
@@ -71,14 +100,19 @@ namespace DEngine
 		delete[count] inputElements;
 		return il;
 	}
-	Shader D3D11GraphicsFactory::CreateShader(void** VSSources, size_t* VSSize, unsigned int VSCount, void** PSSources, size_t* PSSize, unsigned int PSCount, INPUT_LAYOUT* inputLayout, unsigned int inputElementsCount)
+	Shader* D3D11GraphicsFactory::CreateShader(void** VSSources, size_t* VSSize, unsigned int VSCount, void** PSSources, size_t* PSSize, unsigned int PSCount, INPUT_LAYOUT* inputLayout, unsigned int inputElementsCount)
 	{
 		ID3DBlob* vs_blob;
 		ID3D11VertexShader* vs = CreateVertexShader(VSSources, VSSize, VSCount, &vs_blob);
 		ID3D11PixelShader* ps = CreatePixelShader(PSSources, PSSize, PSCount);
 		ID3D11InputLayout* il = CreateInputLayout(inputLayout, inputElementsCount, vs_blob);
 		vs_blob->Release();
-		return (Shader)D3D11Shader(vs, ps, il);
+		Shader* shader = new D3D11Shader(vs, ps, il);
+		return shader;
+	}
+	D3D11GraphicsFactory::~D3D11GraphicsFactory()
+	{
+
 	}
 }
 
@@ -104,6 +138,43 @@ DXGI_FORMAT GetInputFormat(DEngine::INPUT_FORMAT format)
 		break;
 	default:
 		return DXGI_FORMAT_UNKNOWN;
+		break;
+	}
+}
+
+D3D11_USAGE GetUsage(DEngine::DATA_USAGE usage)
+{
+	switch (usage)
+	{
+	case DEngine::DATA_USAGE::GRW:
+		return D3D11_USAGE_DEFAULT;
+		break;
+	case DEngine::DATA_USAGE::GR:
+		return D3D11_USAGE_IMMUTABLE;
+		break;
+	case DEngine::DATA_USAGE::GR_CW:
+		return D3D11_USAGE_DYNAMIC;
+		break;
+	default:
+		return D3D11_USAGE_DEFAULT;
+		break;
+	}
+}
+int GetCPUAccessFlags(DEngine::DATA_USAGE usage)
+{
+	switch (usage)
+	{
+	case DEngine::DATA_USAGE::GRW:
+		return 0;
+		break;
+	case DEngine::DATA_USAGE::GR:
+		return 0;
+		break;
+	case DEngine::DATA_USAGE::GR_CW:
+		return D3D11_CPU_ACCESS_WRITE;
+		break;
+	default:
+		return 0;
 		break;
 	}
 }
