@@ -6,7 +6,7 @@ namespace DEngine
 	class D3D11GraphicsFactory : public GraphicsFactory
 	{
 	private:
-		static Direct3D11Context* graphicsContext;
+		Direct3D11Context* graphicsContext;
 
 	private:
 		ID3D11VertexShader* CreateVertexShader(void** VSSources, size_t* VSSize, unsigned int VSCount, ID3DBlob** vs_blob_out);
@@ -15,7 +15,8 @@ namespace DEngine
 	public:
 		D3D11GraphicsFactory(Direct3D11Context* _graphicsContext);
 		virtual ~D3D11GraphicsFactory();
-		virtual ShaderData* CreateShaderData(void** data, size_t* size, unsigned int count, DATA_USAGE usage);
+		virtual ShaderData* CreateShaderData(void** data, unsigned int* size, unsigned int count, DATA_USAGE usage);
+		virtual Mesh* CreateMesh(Vertex* vertices, unsigned int verticesCount, unsigned int* indices, unsigned int indicesCount);
 		virtual Shader* CreateShader(void** VSSources, size_t* VSSize, unsigned int VSCount, void** PSSources, size_t* PSSize, unsigned int PSCount, INPUT_LAYOUT* inputLayout, unsigned int inputElementsCount);
 	};
 }

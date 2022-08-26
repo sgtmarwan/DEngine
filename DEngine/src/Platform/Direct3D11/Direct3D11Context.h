@@ -17,13 +17,15 @@ namespace DEngine
 		ID3D11DepthStencilState* depthStencilState = nullptr;
 		ID3D11RasterizerState2* rasterizerState = nullptr;
 		D3D11_VIEWPORT viewport = { 0 };
-		DXGI_PRESENT_PARAMETERS presentParameters;
+		DXGI_PRESENT_PARAMETERS presentParameters = { 0 };
 	public:
 		Direct3D11Context(const HWND& hWnd, unsigned short backBufferCount, unsigned short vsync);
 		virtual ~Direct3D11Context();
 		virtual void ChangeRes(unsigned int width, unsigned int height) override;
 		virtual void Resize(unsigned int width, unsigned int height) override;
+		virtual void ClearBackBuffer(Vector4 color, float depth, char stencil) override;
 		virtual void PresentFrame() override;
+		virtual void Draw(unsigned int indicesCount) override;
 		ID3D11Device5* GetDevice();
 		ID3D11DeviceContext4* GetDeviceContext();
 	private:

@@ -5,7 +5,6 @@ namespace DEngine
 {
 	struct ShaderData
 	{
-		size_t* Size;
 		unsigned int DataCount;
 		virtual ~ShaderData() = default;
 	};

@@ -72,9 +72,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PublicIncludeDirectories>$(ProjectDir)include</PublicIncludeDirectories>
+    <AllProjectIncludesArePublic>false</AllProjectIncludesArePublic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PublicIncludeDirectories>$(ProjectDir)include</PublicIncludeDirectories>
+    <AllProjectIncludesArePublic>false</AllProjectIncludesArePublic>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgAutoLink>false</VcpkgAutoLink>
@@ -115,12 +117,12 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>user32.lib;d3d11.lib;d3dcompiler.lib</AdditionalDependencies>
+      <AdditionalDependencies>user32.lib;d3d11.lib;d3dcompiler.lib;shell32.lib;kernel32.lib;dxgi.lib;gdi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -133,19 +135,26 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>user32.lib;d3d11.lib;d3dcompiler.lib</AdditionalDependencies>
+      <AdditionalDependencies>user32.lib;d3d11.lib;d3dcompiler.lib;shell32.lib;kernel32.lib;dxgi.lib;gdi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\DEngine.h" />
+    <ClInclude Include="include\Math\Vector2.h" />
+    <ClInclude Include="include\Math\Vector4.h" />
+    <ClInclude Include="src\DEngine\Graphics\Mesh.h" />
+    <ClInclude Include="src\DEngine\Graphics\Vertex.h" />
+    <ClInclude Include="include\TestGame.h" />
     <ClInclude Include="src\Platform\Direct3D11\D3D11GraphicsFactory.h" />
     <ClInclude Include="src\DEngine\Graphics\GraphicsFactory.h" />
+    <ClInclude Include="src\Platform\Direct3D11\D3D11Mesh.h" />
     <ClInclude Include="src\Platform\Direct3D11\D3D11Shader.h" />
     <ClInclude Include="src\DEngine\Graphics\INPUT_LAYOUT.h" />
     <ClInclude Include="src\DEngine\Graphics\Shader.h" />
@@ -155,10 +164,17 @@
     <ClInclude Include="src\Platform\Windows\DEW.h" />
     <ClInclude Include="src\Platform\Windows\WinWindow.h" />
     <ClInclude Include="src\DEngine\Core\Window.h" />
+    <ClInclude Include="include\Math\Vector3.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\DEngine\Graphics\Mesh.cpp" />
+    <ClCompile Include="src\DEngine\Math\Vector2.cpp" />
+    <ClCompile Include="src\DEngine\Math\Vector3.cpp" />
+    <ClCompile Include="src\DEngine\Math\Vector4.cpp" />
+    <ClCompile Include="src\DEngine\Testing\TestGame.cpp" />
     <ClCompile Include="src\Platform\Direct3D11\D3D11GraphicsFactory.cpp" />
     <ClCompile Include="src\DEngine\Graphics\GraphicsFactory.cpp" />
+    <ClCompile Include="src\Platform\Direct3D11\D3D11Mesh.cpp" />
     <ClCompile Include="src\Platform\Direct3D11\D3D11Shader.cpp" />
     <ClCompile Include="src\DEngine\Graphics\Shader.cpp" />
     <ClCompile Include="src\Platform\Direct3D11\Direct3D11Context.cpp" />

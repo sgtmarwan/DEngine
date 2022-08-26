@@ -7,4 +7,9 @@ namespace DEngine
 	{
 
 	}
+
+	void Window::SetGraphicsContext(GraphicsContext* gc)
+	{
+		graphicsContext = gc;
+	}
 }

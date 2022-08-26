@@ -1,6 +1,29 @@
 #include "WinWindow.h"
 namespace DEngine
 {
+	void WinWindow::Show()
+	{
+		ShowWindow(hWnd, 1);
+	}
+
+	long long WinWindow::Update()
+	{
+		if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessageW(&msg);
+		}
+		switch (msg.message)
+		{
+		case WM_QUIT:
+			return msg.wParam;
+			break;
+		default:
+			return 1;
+			break;
+		}
+	}
+
 	void WinWindow::CreateWindowClass(HINSTANCE hInst)
 	{
 		WNDCLASSEX wc = {};
@@ -50,6 +73,11 @@ namespace DEngine
 		DestroyWindow(hWnd);
 	}
 
+	HWND& WinWindow::GetWindowHandle()
+	{
+		return hWnd;
+	}
+
 	LRESULT __stdcall WinWindow::setUpMsgPrc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (msg == WM_NCCREATE)
@@ -73,7 +101,7 @@ namespace DEngine
 		switch (msg)
 		{
 		case WM_SIZE:
-			//TODO: Handle Window Resize
+			graphicsContext->Resize(LOWORD(lParam), HIWORD(lParam));
 			break;
 		case WM_CLOSE:
 			PostQuitMessage(0);

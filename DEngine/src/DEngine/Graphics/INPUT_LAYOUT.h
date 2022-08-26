@@ -9,7 +9,7 @@ namespace DEngine
 
 	struct INPUT_LAYOUT
 	{
-		char* Name;
+		const char* Name;
 		INPUT_FORMAT Format;
 		unsigned int Index;
 		unsigned int Offset;

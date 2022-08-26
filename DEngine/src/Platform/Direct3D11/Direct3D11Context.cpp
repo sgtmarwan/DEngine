@@ -7,6 +7,15 @@ namespace DEngine
 	{
 		CreateDeviceAndContext(D3D_DRIVER_TYPE_HARDWARE);
 		CreateSwapChain(hWnd);
+		SetOMStates();
+		RECT winRect;
+		GetClientRect(hWnd, &winRect);
+		Resize((winRect.right - winRect.left), (winRect.bottom - winRect.top));
+		presentParameters.DirtyRectsCount = 0;
+		presentParameters.pDirtyRects = 0;
+		presentParameters.pScrollOffset = 0;
+		presentParameters.pScrollRect = 0;
+		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	}
 
 	Direct3D11Context::~Direct3D11Context()
@@ -19,6 +28,11 @@ namespace DEngine
 		if (swapChain != nullptr) swapChain->Release();
 		if (deviceContext != nullptr) deviceContext->Release();
 		if (device != nullptr) device->Release();
+	}
+
+	void Direct3D11Context::Draw(unsigned int indicesCount)
+	{
+		deviceContext->DrawIndexed(indicesCount, 0, 0);
 	}
 
 	void Direct3D11Context::ChangeRes(unsigned int width, unsigned int height)
@@ -78,6 +92,13 @@ namespace DEngine
 	{
 		return deviceContext;
 	}
+
+	void Direct3D11Context::ClearBackBuffer(Vector4 color, float depth, char stencil)
+	{
+		deviceContext->ClearRenderTargetView(renderTargetView, (float*) & color);
+		deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, depth, stencil);
+	}
+
 	void Direct3D11Context::CreateDeviceAndContext(D3D_DRIVER_TYPE driverType)
 	{
 		ID3D11Device* d;

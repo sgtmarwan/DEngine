@@ -8,10 +8,14 @@ namespace DEngine
 	private:
 		const wchar_t* WNDCLSNAME;
 		HWND hWnd;
+		MSG msg;
 		void CreateWindowClass(HINSTANCE hInst);
 		void CreateWindow(HINSTANCE hInst);
 	public:
 		WinWindow(const wchar_t* windowName, const wchar_t* windowClassName, unsigned int width, unsigned int height);
+		virtual void Show() override;
+		virtual long long Update() override;
+		HWND& GetWindowHandle();
 		~WinWindow();
 	private:
 		static LRESULT WINAPI setUpMsgPrc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

@@ -1,5 +1,6 @@
 #pragma once
 #include "Shader.h"
+#include "Mesh.h"
 namespace DEngine
 {
 	enum class DATA_USAGE
@@ -12,8 +13,9 @@ namespace DEngine
 
 	public:
 		virtual ~GraphicsFactory() = default;
-		virtual ShaderData* CreateShaderData(void** data, size_t* size, unsigned int count, DATA_USAGE usage) = 0;
+		virtual ShaderData* CreateShaderData(void** data, unsigned int* size, unsigned int count, DATA_USAGE usage) = 0;
 		virtual Shader* CreateShader(void** VSSources, size_t* VSSize, unsigned int VSCount, void** PSSources, size_t* PSSize, unsigned int PSCount, INPUT_LAYOUT* inputLayout, unsigned int inputElementsCount) = 0;
+		virtual Mesh* CreateMesh(Vertex* vertices, unsigned int verticesCount, unsigned int* indices, unsigned int indicesCount) = 0;
 	};
 }
 

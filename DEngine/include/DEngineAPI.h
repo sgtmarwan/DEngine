@@ -1,5 +1,5 @@
 #pragma once
-#ifdef _DLL
+#ifdef _WINDLL
 
 #define DEAPI __declspec(dllexport)
 

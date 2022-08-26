@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DEngine", "DEngine\DEngine.vcxproj", "{FCFEAA7C-59B8-434D-8E07-8433359C8A72}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sandbox", "sandbox\sandbox.vcxproj", "{6E8B6212-E161-4B4D-818D-43A772FFC2AB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FCFEAA7C-59B8-434D-8E07-8433359C8A72} = {FCFEAA7C-59B8-434D-8E07-8433359C8A72}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
