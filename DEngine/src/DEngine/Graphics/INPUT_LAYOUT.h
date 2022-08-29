@@ -4,7 +4,7 @@ namespace DEngine
 {
 	enum class INPUT_FORMAT
 	{
-		int32_1 = 0, uint32_1, float32_1, float32_3, float32_4
+		int32_1 = 0, uint32_1, uint8_4, float32_1, float32_2, float32_3, float32_4
 	};
 
 	struct INPUT_LAYOUT

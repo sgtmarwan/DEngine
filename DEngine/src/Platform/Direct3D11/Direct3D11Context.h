@@ -25,7 +25,15 @@ namespace DEngine
 		virtual void Resize(unsigned int width, unsigned int height) override;
 		virtual void ClearBackBuffer(Vector4 color, float depth, char stencil) override;
 		virtual void PresentFrame() override;
-		virtual void Draw(unsigned int indicesCount) override;
+		virtual void Draw(unsigned int indicesCount) const override;
+		virtual void BindShader(const Shader* shader) const override;
+		virtual void BindMesh(const Mesh* mesh) const override;
+		virtual void SetVSShaderData(const ShaderData* data, const unsigned int index) const override;
+		virtual void SetPSShaderData(const ShaderData* data, const unsigned int index) const override;
+		virtual void SetPSSampler(const Sampler* sampler, const unsigned int index) const override;
+		virtual void SetPSTexture2D(const Texture2D* texture, const unsigned int index) const override;
+
+	public:
 		ID3D11Device5* GetDevice();
 		ID3D11DeviceContext4* GetDeviceContext();
 	private:

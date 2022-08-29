@@ -1,7 +1,10 @@
 #include "Direct3D11Context.h"
+#include "D3D11Shader.h"
+#include "D3D11Mesh.h"
+#include "D3D11Texture2D.h"
+
 namespace DEngine
 {
-
 	Direct3D11Context::Direct3D11Context(const HWND& hWnd, unsigned short backBufferCount, unsigned short vsync) :
 		GraphicsContext(backBufferCount, vsync)
 	{
@@ -30,7 +33,25 @@ namespace DEngine
 		if (device != nullptr) device->Release();
 	}
 
-	void Direct3D11Context::Draw(unsigned int indicesCount)
+
+	void Direct3D11Context::BindShader(const Shader* shader) const
+	{
+		const D3D11Shader* sh = (D3D11Shader*)shader;
+		deviceContext->VSSetShader(sh->VertexShader, nullptr, 0);
+		deviceContext->PSSetShader(sh->PixelShader, nullptr, 0);
+		deviceContext->IASetInputLayout(sh->InputLayout);
+		
+	}
+	void Direct3D11Context::BindMesh(const Mesh* mesh) const
+	{
+		const D3D11Mesh* mh = (D3D11Mesh*)mesh;
+		unsigned int VS = sizeof(Vertex);
+		unsigned int VO = 0;
+		deviceContext->IASetVertexBuffers(0, 1, &mh->VertexBuffer, &VS, &VO);
+		deviceContext->IASetIndexBuffer(mh->IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	}
+
+	void Direct3D11Context::Draw(unsigned int indicesCount) const
 	{
 		deviceContext->DrawIndexed(indicesCount, 0, 0);
 	}
@@ -46,6 +67,17 @@ namespace DEngine
 		dmd.Scaling = DXGI_MODE_SCALING_CENTERED;
 		dmd.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		swapChain->ResizeTarget(&dmd);
+	}
+
+	void Direct3D11Context::SetPSSampler(const Sampler* sampler, const unsigned int index) const
+	{
+		const D3D11Sampler* sm = (D3D11Sampler*)sampler;
+		deviceContext->PSSetSamplers(index, 1, &sm->SamplerState);
+	}
+	void Direct3D11Context::SetPSTexture2D(const Texture2D* texture, const unsigned int index) const
+	{
+		const D3D11Texture2D* tx = (D3D11Texture2D*)texture;
+		deviceContext->PSSetShaderResources(index, 1, &tx->TextureResourceView);
 	}
 
 	void Direct3D11Context::Resize(unsigned int width, unsigned int height)
@@ -101,6 +133,10 @@ namespace DEngine
 
 	void Direct3D11Context::CreateDeviceAndContext(D3D_DRIVER_TYPE driverType)
 	{
+		UINT creationFlags = 0;
+#if defined(_DEBUG)
+		creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
 		ID3D11Device* d;
 		ID3D11DeviceContext* dc;
 		D3D11CreateDevice(0, driverType, 0, 0, nullptr, 0, D3D11_SDK_VERSION, &d, nullptr, &dc);
@@ -108,6 +144,17 @@ namespace DEngine
 		dc->QueryInterface<ID3D11DeviceContext4>(&deviceContext);
 		d->Release();
 		dc->Release();
+	}
+
+	void Direct3D11Context::SetVSShaderData(const ShaderData* data, const unsigned int index) const
+	{
+		const D3D11ShaderData* Data = (D3D11ShaderData*)data;
+		deviceContext->VSSetConstantBuffers(index, Data->DataCount, Data->Data);
+	}
+	void Direct3D11Context::SetPSShaderData(const ShaderData* data, const unsigned int index) const
+	{
+		const D3D11ShaderData* Data = (D3D11ShaderData*)data;
+		deviceContext->PSSetConstantBuffers(index, Data->DataCount, Data->Data);
 	}
 	void Direct3D11Context::CreateSwapChain(const HWND& hwnd)
 	{

@@ -15,16 +15,10 @@ void** ReadSource(char** source, unsigned int c, size_t** sizes)
 		file.open(source[i], std::ios_base::binary);
 		if (!file.is_open())
 			return nullptr;
-		std::filesystem::file_size(std::filesystem::path(source[i]));
-		//file.seekg(0, std::ios::end);
-		//size_t fileSize = file.tellg();
 		size_t fileSize = std::filesystem::file_size(std::filesystem::path(source[i]));
 		(* sizes)[i] = fileSize;
-		//file.seekg(0, std::ios::beg);
 		src[i] = new char[fileSize];
-			// read the file
-			file.read(src[i], fileSize);
-
+		file.read(src[i], fileSize);
 		file.close();
 	}
 	return (void**)src;
@@ -38,13 +32,11 @@ namespace DEngine
 		WinWindow* WinWnd = new WinWindow(L"TestGame", L"CLS", width, height);
 		gc = new Direct3D11Context(WinWnd->GetWindowHandle(), 3, 0);
 		gf = new D3D11GraphicsFactory((Direct3D11Context*)gc);
-		D3D11Mesh::SetGraphicsContext((Direct3D11Context*)gc);
-		D3D11Shader::SetGraphicsContext((Direct3D11Context*)gc);
 		WinWnd->SetGraphicsContext(gc);
 		wnd = WinWnd;
 	}
 
-	void TestGame::Run(Vertex* verts, unsigned int vertsCount,unsigned int* ind, unsigned int count, char** vs, unsigned int vsc, char** ps, unsigned int psc,INPUT_LAYOUT* il, unsigned int ilc)
+	void TestGame::Run(Vertex* verts, unsigned int vertsCount, unsigned int* ind, unsigned int count, char** vs, unsigned int vsc, char** ps, unsigned int psc, INPUT_LAYOUT* il, unsigned int ilc, void* image, unsigned int width, unsigned int height, unsigned int cc)
 	{
 		Vector4* color = new Vector4();
 		*color = { 0.5f, 0.3f, 0.7f, 1.0f };
@@ -54,10 +46,14 @@ namespace DEngine
 		void** vs_sources = ReadSource(vs, vsc, &vs_s);
 		void** ps_sources = ReadSource(ps, psc, &ps_s);
 		Shader* shader = gf->CreateShader(vs_sources, vs_s, 1, ps_sources, ps_s, 1, il, ilc);
-		mesh->Bind();
-		shader->Bind();
+		Texture2D* tex = gf->CreateTexture2D(image, width, height, 4, 4,DATA_USAGE::GR_CW);
+		Sampler* sampl = gf->CreateSampler();
+		gc->BindMesh(mesh);
+		gc->BindShader(shader);
+		gc->SetPSTexture2D(tex, 0);
+		gc->SetPSSampler(sampl, 0);
 		ShaderData* psData = gf->CreateShaderData((void**) & color, colorSizes, 1, DATA_USAGE::GR_CW);
-		shader->SetPSShaderData(psData, 0);
+		gc->SetPSShaderData(psData, 0);
 		wnd->Show();
 		while (wnd->Update())
 		{

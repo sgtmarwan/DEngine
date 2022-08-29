@@ -150,6 +150,7 @@
     <ClInclude Include="include\Math\Vector2.h" />
     <ClInclude Include="include\Math\Vector4.h" />
     <ClInclude Include="src\DEngine\Graphics\Mesh.h" />
+    <ClInclude Include="src\DEngine\Graphics\Texture2D.h" />
     <ClInclude Include="src\DEngine\Graphics\Vertex.h" />
     <ClInclude Include="include\TestGame.h" />
     <ClInclude Include="src\Platform\Direct3D11\D3D11GraphicsFactory.h" />
@@ -158,6 +159,7 @@
     <ClInclude Include="src\Platform\Direct3D11\D3D11Shader.h" />
     <ClInclude Include="src\DEngine\Graphics\INPUT_LAYOUT.h" />
     <ClInclude Include="src\DEngine\Graphics\Shader.h" />
+    <ClInclude Include="src\Platform\Direct3D11\D3D11Texture2D.h" />
     <ClInclude Include="src\Platform\Direct3D11\Direct3D11Context.h" />
     <ClInclude Include="src\DEngine\Graphics\GraphicsContext.h" />
     <ClInclude Include="include\DEngineAPI.h" />
@@ -168,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DEngine\Graphics\Mesh.cpp" />
+    <ClCompile Include="src\DEngine\Graphics\Texture2D.cpp" />
     <ClCompile Include="src\DEngine\Math\Vector2.cpp" />
     <ClCompile Include="src\DEngine\Math\Vector3.cpp" />
     <ClCompile Include="src\DEngine\Math\Vector4.cpp" />
@@ -177,6 +180,7 @@
     <ClCompile Include="src\Platform\Direct3D11\D3D11Mesh.cpp" />
     <ClCompile Include="src\Platform\Direct3D11\D3D11Shader.cpp" />
     <ClCompile Include="src\DEngine\Graphics\Shader.cpp" />
+    <ClCompile Include="src\Platform\Direct3D11\D3D11Texture2D.cpp" />
     <ClCompile Include="src\Platform\Direct3D11\Direct3D11Context.cpp" />
     <ClCompile Include="src\DEngine\Graphics\GraphicsContext.cpp" />
     <ClCompile Include="src\Platform\Windows\WinWindow.cpp" />

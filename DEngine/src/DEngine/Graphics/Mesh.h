@@ -1,6 +1,5 @@
 #pragma once
 #include "Vertex.h"
-#include "GraphicsContext.h"
 namespace DEngine
 {
 	class Mesh
@@ -11,6 +10,5 @@ namespace DEngine
 		Mesh(unsigned int ic);
 		unsigned int GetIndicesCount();
 		virtual ~Mesh() = default;
-		virtual void Bind() = 0;
 	};
 }
