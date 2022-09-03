@@ -11,7 +11,7 @@ namespace DEngine
 	{
 		const char* Name;
 		INPUT_FORMAT Format;
-		unsigned int Index;
+		unsigned int Slot;
 		unsigned int Offset;
 	};
 }

@@ -11,10 +11,10 @@ int main()
 	char* vs = (char*)"res/shaders/VertexShader.cso";
 	char* ps = (char*)"res/shaders/PixelShader.cso";
 	DEngine::Vertex verts[] = {
-		{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-		{{ 0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-		{{ 0.5f,-0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f}},
-		{{-0.5f,-0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}
+		{{-0.5f, 0.5f,   1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+		{{ 0.5f, 0.5f,   1.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+		{{ 0.5f,-0.5f,   1.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f}},
+		{{-0.5f,-0.5f,   1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}
 	};
 	unsigned int inds[] = {
 		0,1,2,

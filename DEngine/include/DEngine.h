@@ -1,3 +1,13 @@
 #pragma once
-#include "DEngine/Graphics/INPUT_LAYOUT.h"
-#include "DEngine/Graphics/Vertex.h"
+
+#include "DEngine/Graphics/GraphicsContext.h"
+
+namespace DEngine
+{
+	enum class GraphicsAPI
+	{
+		Direct3D11 = 0
+	};
+
+	void SetupGraphicsContext(const GraphicsContext* gc, GraphicsAPI api);
+}

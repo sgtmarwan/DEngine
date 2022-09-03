@@ -101,11 +101,108 @@ namespace DEngine
 		switch (msg)
 		{
 		case WM_SIZE:
-			graphicsContext->Resize(LOWORD(lParam), HIWORD(lParam));
+			width = LOWORD(lParam);
+			height = HIWORD(lParam);
+			graphicsContext->Resize(width, height);
 			break;
 		case WM_CLOSE:
 			PostQuitMessage(0);
 			break;
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
+			if (!(lParam & 0x40000000) || kbd->AutoRepeat)
+				kbd->OnKeyDown(static_cast<unsigned char>(wParam));
+			break;
+		case WM_KEYUP:
+		case WM_SYSKEYUP:
+			kbd->OnKeyUp(static_cast<unsigned char>(wParam));
+			break;
+		case WM_CHAR:
+			kbd->OnChar(static_cast<char>(wParam));
+			break;
+		case WM_KILLFOCUS:
+			kbd->ClearState();
+			break;
+		case WM_MOUSEMOVE:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+
+			float x = float(pt.x) / float(width);
+			float y = float(pt.y) / float(height);
+			if (pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height)
+			{
+				mse->OnMove(x, y);
+				if (!mse->IsInWindow())
+				{
+					SetCapture(hWnd);
+					mse->OnEnter();
+				}
+			}
+
+			else
+			{
+				if (wParam & (MK_LBUTTON | MK_RBUTTON))
+				{
+					mse->OnMove(x, y);
+				}
+
+				else
+				{
+					ReleaseCapture();
+					mse->OnLeave();
+				}
+			}
+			break;
+		}
+		case WM_LBUTTONDOWN:
+		{
+			SetForegroundWindow(hWnd);
+			const POINTS pt = MAKEPOINTS(lParam);
+
+			float x = float(pt.x) / float(width);
+			float y = float(pt.y) / float(height);
+			mse->OnButtonDown(x, y, 0);
+			break;
+		}
+		case WM_RBUTTONDOWN:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+
+			float x = float(pt.x) / float(width);
+			float y = float(pt.y) / float(height);
+			mse->OnButtonDown(x, y, 1);
+			break;
+		}
+		case WM_LBUTTONUP:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+
+			float x = float(pt.x) / float(width);
+			float y = float(pt.y) / float(height);
+			mse->OnButtonUp(x, y, 0);
+
+			if (pt.x < 0 || pt.x >= width || pt.y < 0 || pt.y >= height)
+			{
+				ReleaseCapture();
+				mse->OnLeave();
+			}
+			break;
+		}
+		case WM_RBUTTONUP:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+
+			float x = float(pt.x) / float(width);
+			float y = float(pt.y) / float(height);
+			mse->OnButtonUp(x, y, 1);
+
+			if (pt.x < 0 || pt.x >= width || pt.y < 0 || pt.y >= height)
+			{
+				ReleaseCapture();
+				mse->OnLeave();
+			}
+			break;
+		}
 		default:
 			break;
 		}

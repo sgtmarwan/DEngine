@@ -7,6 +7,8 @@
 #include "Platform/Direct3D11/D3D11Mesh.h"
 #include "Platform/Direct3D11/D3D11Shader.h"
 #include "Platform/Direct3D11/D3D11Texture2D.h"
+#include "DEngine/Input/keyboard.h"
+#include "DEngine/Input/mouse.h"
 namespace DEngine
 {
 	class DEAPI TestGame
@@ -15,6 +17,8 @@ namespace DEngine
 		Window* wnd;
 		GraphicsContext* gc;
 		GraphicsFactory* gf;
+		keyboard* kbd;
+		mouse* Mouse;
 	public:
 		TestGame(unsigned int width, unsigned int height);
 		void Run(Vertex* verts, unsigned int vertsCount, unsigned int* ind, unsigned int count, char** vs, unsigned int vsc, char** ps, unsigned int psc, INPUT_LAYOUT* il, unsigned int ilc, void* image, unsigned int width, unsigned int height, unsigned int cc);

@@ -1,8 +1,3 @@
-cbuffer b : register(b0)
-{
-	float4 Color;
-}
-
 
 Texture2D tex : register(t0);
 SamplerState smpl : register(s0);

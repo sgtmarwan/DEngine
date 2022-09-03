@@ -6,7 +6,11 @@
 #include "D3D11Texture2D.h"
 
 
-DXGI_FORMAT GetInputFormat(DEngine::INPUT_FORMAT format);
+
+
+DXGI_FORMAT GetInputFormat(DEngine::INPUT_FORMAT format);				//Group into struct ???
+DXGI_FORMAT GetTexture2DFormat(DEngine::TEXTURE2D_FOMAT format);
+UINT GetTexture2DPixelSize(DEngine::TEXTURE2D_FOMAT format);
 D3D11_USAGE GetUsage(DEngine::DATA_USAGE usage);
 int GetCPUAccessFlags(DEngine::DATA_USAGE usage);
 
@@ -27,7 +31,9 @@ namespace DEngine
 		D3DCreateBlob(VSSize[0], &vs_blob);
 		memcpy(vs_blob->GetBufferPointer(), VSSources[0], VSSize[0]);
 		*vs_blob_out = vs_blob;
-		graphicsContext->GetDevice()->CreateVertexShader(vs_blob->GetBufferPointer(), vs_blob->GetBufferSize(), nullptr, &vs);
+		auto hr = graphicsContext->GetDevice()->CreateVertexShader(vs_blob->GetBufferPointer(), vs_blob->GetBufferSize(), nullptr, &vs);
+		if (hr != S_OK)
+			MessageBoxW(NULL, L"Error", NULL, NULL);
 		return vs;
 	}
 	ID3D11PixelShader* D3D11GraphicsFactory::CreatePixelShader(void** PSSources, size_t* PSSize, unsigned int PSCount) const
@@ -41,33 +47,28 @@ namespace DEngine
 		ID3D11InputLayout* il;
 		D3D11_INPUT_ELEMENT_DESC* inputElements = new D3D11_INPUT_ELEMENT_DESC[count];
 		for (unsigned int i = 0; i < count; ++i)
-			inputElements[i] = { inputLayout[i].Name, inputLayout[i].Index, GetInputFormat(inputLayout[i].Format), 0, inputLayout[i].Offset, D3D11_INPUT_PER_VERTEX_DATA, 0};
+			inputElements[i] = { inputLayout[i].Name, inputLayout[i].Slot, GetInputFormat(inputLayout[i].Format), 0, inputLayout[i].Offset, D3D11_INPUT_PER_VERTEX_DATA, 0};
 		graphicsContext->GetDevice()->CreateInputLayout(inputElements, count, vs_blob->GetBufferPointer(), vs_blob->GetBufferSize(), &il);
-		delete[count] inputElements;
+		delete[] inputElements;
 		return il;
 	}
-	ShaderData* D3D11GraphicsFactory::CreateShaderData(void** data, unsigned int* size, unsigned int count, DATA_USAGE usage) const
+	ShaderData* D3D11GraphicsFactory::CreateShaderData(void* data, unsigned int size, DATA_USAGE usage) const
 	{
-		ID3D11Buffer** buff = new ID3D11Buffer*[count];
-		D3D11ShaderData* shaderData = new D3D11ShaderData();
-		shaderData->DataCount = count;
+		ID3D11Buffer* buff;
 		D3D11_BUFFER_DESC bd = {};
 		D3D11_SUBRESOURCE_DATA sd = {};
 		sd.SysMemPitch = 0;
 		sd.SysMemSlicePitch = 0;
 		bd.MiscFlags = 0;
 		bd.StructureByteStride = 0;
-		for (unsigned int i = 0; i < count; ++i)
-		{
-			bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-			bd.ByteWidth = size[i];
-			bd.Usage = GetUsage(usage);
-			bd.CPUAccessFlags = GetCPUAccessFlags(usage);
+		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		bd.ByteWidth = size;
+		bd.Usage = GetUsage(usage);
+		bd.CPUAccessFlags = GetCPUAccessFlags(usage);
 
-			sd.pSysMem = data[i];
-			graphicsContext->GetDevice()->CreateBuffer(&bd, &sd, &buff[i]);
-		}
-		shaderData->Data = buff;
+		sd.pSysMem = data;
+		graphicsContext->GetDevice()->CreateBuffer(&bd, &sd, &buff);
+		D3D11ShaderData* shaderData = new D3D11ShaderData(buff);
 		return shaderData;
 	}
 	Shader* D3D11GraphicsFactory::CreateShader(void** VSSources, size_t* VSSize, unsigned int VSCount, void** PSSources, size_t* PSSize, unsigned int PSCount, INPUT_LAYOUT* inputLayout, unsigned int inputElementsCount) const
@@ -109,34 +110,59 @@ namespace DEngine
 		Mesh* msh = new D3D11Mesh(vb, ib, indicesCount);
 		return msh;
 	}
-	Texture2D* D3D11GraphicsFactory::CreateTexture2D(void* image, unsigned int width, unsigned int height, int format, unsigned int channelsNum, DATA_USAGE usage) const
+	Texture2D* D3D11GraphicsFactory::CreateTexture2D(void* image, unsigned int width, unsigned int height, TEXTURE2D_FOMAT format, DATA_USAGE usage, unsigned int mipLevels) const
 	{
 		ID3D11Texture2D* texture;
 		ID3D11ShaderResourceView* srv;
+
+
+		UINT bindFlags = D3D11_BIND_SHADER_RESOURCE;
+		UINT miscFlags = 0;
+
 		D3D11_SUBRESOURCE_DATA sd;
+
+
+		if (mipLevels == 1)
+		{
+			sd.pSysMem = image;
+			sd.SysMemPitch = width * GetTexture2DPixelSize(format);
+			sd.SysMemSlicePitch = 0;
+
+		}
+		else 
+		{
+			bindFlags |= D3D11_BIND_RENDER_TARGET;
+			miscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
+		}
 		D3D11_TEXTURE2D_DESC td;
-		D3D11_SHADER_RESOURCE_VIEW_DESC srvd;
 		td.Width = width;
 		td.Height = height;
-		td.MipLevels = 1;
-		td.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		td.MipLevels = mipLevels;
+		td.BindFlags = bindFlags;
 		td.SampleDesc = { 1,0 };
 		td.CPUAccessFlags = GetCPUAccessFlags(usage);
 		td.Usage = GetUsage(usage);
-		td.Format = DXGI_FORMAT_R8G8B8A8_UNORM;//TODO: Format
-		td.MiscFlags = 0;
+		td.Format = GetTexture2DFormat(format);
+		td.MiscFlags = miscFlags;
 		td.ArraySize = 1;
 
-		sd.pSysMem = image;
-		sd.SysMemPitch = width * 4;
-		sd.SysMemSlicePitch = 0;
+		if (mipLevels != 1)
+		{
+			graphicsContext->GetDevice()->CreateTexture2D(&td, nullptr, &texture);
+			graphicsContext->GetDeviceContext()->UpdateSubresource(texture, 0, nullptr, image, width * GetTexture2DPixelSize(format), 0);//, D3D11_COPY_DISCARD);
+		} 
+		else graphicsContext->GetDevice()->CreateTexture2D(&td, &sd, &texture);
 
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvd;
 		srvd.Format = td.Format;
 		srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		srvd.Texture2D = { 0,1 }; //TODO: do something about mipmaps
+		srvd.Texture2D.MostDetailedMip = 0;
+		srvd.Texture2D.MipLevels = (mipLevels == 0) ? -1 : mipLevels;
 
-		graphicsContext->GetDevice()->CreateTexture2D(&td, &sd, &texture);
 		graphicsContext->GetDevice()->CreateShaderResourceView(texture, &srvd, &srv);
+		if (mipLevels != 1)
+			graphicsContext->GetDeviceContext()->GenerateMips(srv);
 		Texture2D* tex = new D3D11Texture2D(texture, srv);
 		return tex;
 	}
@@ -144,10 +170,13 @@ namespace DEngine
 	{
 		ID3D11SamplerState* ss;
 		D3D11_SAMPLER_DESC sd = {};
-		sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		sd.Filter = D3D11_FILTER_ANISOTROPIC;
 		sd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 		sd.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 		sd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		sd.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
+		sd.MinLOD = 0;
+		sd.MaxLOD = D3D11_FLOAT32_MAX;
 		graphicsContext->GetDevice()->CreateSamplerState(&sd, &ss);
 		D3D11Sampler* sampler = new D3D11Sampler(ss);
 		return sampler;
@@ -220,6 +249,33 @@ int GetCPUAccessFlags(DEngine::DATA_USAGE usage)
 		break;
 	case DEngine::DATA_USAGE::GR_CW:
 		return D3D11_CPU_ACCESS_WRITE;
+		break;
+	default:
+		return 0;
+		break;
+	}
+}
+
+DXGI_FORMAT GetTexture2DFormat(DEngine::TEXTURE2D_FOMAT format)
+{
+	switch (format)
+	{
+	case DEngine::TEXTURE2D_FOMAT::RGBA8_UNORM:
+		return DXGI_FORMAT_R8G8B8A8_UNORM;
+		break;
+	default:
+		return DXGI_FORMAT_UNKNOWN;
+		break;
+	}
+}
+
+
+UINT GetTexture2DPixelSize(DEngine::TEXTURE2D_FOMAT format)
+{
+	switch (format)
+	{
+	case DEngine::TEXTURE2D_FOMAT::RGBA8_UNORM:
+		return 4;
 		break;
 	default:
 		return 0;

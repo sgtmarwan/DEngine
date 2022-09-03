@@ -12,4 +12,22 @@ namespace DEngine
 	{
 		graphicsContext = gc;
 	}
+
+	void Window::SetKeyboard(keyboard* k)
+	{
+		kbd = k;
+	}
+	void Window::SetMouse(mouse* m)
+	{
+		 mse = m;
+	}
+
+	unsigned int Window::GetWidth()
+	{
+		return width;
+	}
+	unsigned int Window::GetHeight()
+	{
+		return height;
+	}
 }

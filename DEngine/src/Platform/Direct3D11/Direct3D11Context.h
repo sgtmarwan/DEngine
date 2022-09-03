@@ -20,18 +20,12 @@ namespace DEngine
 		DXGI_PRESENT_PARAMETERS presentParameters = { 0 };
 	public:
 		Direct3D11Context(const HWND& hWnd, unsigned short backBufferCount, unsigned short vsync);
-		virtual ~Direct3D11Context();
-		virtual void ChangeRes(unsigned int width, unsigned int height) override;
-		virtual void Resize(unsigned int width, unsigned int height) override;
-		virtual void ClearBackBuffer(Vector4 color, float depth, char stencil) override;
-		virtual void PresentFrame() override;
-		virtual void Draw(unsigned int indicesCount) const override;
-		virtual void BindShader(const Shader* shader) const override;
-		virtual void BindMesh(const Mesh* mesh) const override;
-		virtual void SetVSShaderData(const ShaderData* data, const unsigned int index) const override;
-		virtual void SetPSShaderData(const ShaderData* data, const unsigned int index) const override;
-		virtual void SetPSSampler(const Sampler* sampler, const unsigned int index) const override;
-		virtual void SetPSTexture2D(const Texture2D* texture, const unsigned int index) const override;
+		~Direct3D11Context();
+		void ChangeRes(unsigned int width, unsigned int height) override;
+		void Resize(unsigned int width, unsigned int height) override;
+		void ClearBackBuffer(Vector4 color, float depth, char stencil) override;
+		void PresentFrame() override;
+		void Draw(unsigned int indicesCount) const override;
 
 	public:
 		ID3D11Device5* GetDevice();

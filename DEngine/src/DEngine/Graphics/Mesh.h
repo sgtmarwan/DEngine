@@ -9,6 +9,7 @@ namespace DEngine
 	public:
 		Mesh(unsigned int ic);
 		unsigned int GetIndicesCount();
+		virtual void Bind(const unsigned int slot) const = 0;
 		virtual ~Mesh() = default;
 	};
 }
