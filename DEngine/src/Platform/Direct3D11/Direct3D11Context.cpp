@@ -3,6 +3,9 @@
 #include "D3D11Mesh.h"
 #include "D3D11Texture2D.h"
 
+
+
+#include <iostream>
 namespace DEngine
 {
 	Direct3D11Context::Direct3D11Context(const HWND& hWnd, unsigned short backBufferCount, unsigned short vsync) :
@@ -10,10 +13,10 @@ namespace DEngine
 	{
 		CreateDeviceAndContext(D3D_DRIVER_TYPE_HARDWARE);
 		CreateSwapChain(hWnd);
-		SetOMStates();
 		RECT winRect;
 		GetClientRect(hWnd, &winRect);
 		Resize((winRect.right - winRect.left), (winRect.bottom - winRect.top));
+		SetOMStates();
 		presentParameters.DirtyRectsCount = 0;
 		presentParameters.pDirtyRects = 0;
 		presentParameters.pScrollOffset = 0;
@@ -47,33 +50,39 @@ namespace DEngine
 		dmd.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		swapChain->ResizeTarget(&dmd);
 	}
+
+
 	void Direct3D11Context::Resize(unsigned int width, unsigned int height)
 	{
-		ID3D11Texture2D* bf = nullptr;
 		if (renderTargetView != nullptr)
 			renderTargetView->Release();
 		if (depthStencilView != nullptr)
 			depthStencilView->Release();
+		if (frameBuffer != nullptr)
+			frameBuffer->Release();
 		swapChain->ResizeBuffers(BackBufferCount, width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
-		swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&bf));
-		device->CreateRenderTargetView1(bf, nullptr, &renderTargetView);
-		bf->Release();
+		swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&frameBuffer));
+		device->CreateRenderTargetView1(frameBuffer, nullptr, &renderTargetView);
 		D3D11_TEXTURE2D_DESC depthStencilBufferDesc = {};
-		depthStencilBufferDesc.ArraySize = 1;
-		depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		depthStencilBufferDesc.CPUAccessFlags = 0;
-		depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		depthStencilBufferDesc.Width = width;
 		depthStencilBufferDesc.Height = height;
 		depthStencilBufferDesc.MipLevels = 1;
+		depthStencilBufferDesc.ArraySize = 1;
+		depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		depthStencilBufferDesc.SampleDesc.Count = 1;
 		depthStencilBufferDesc.SampleDesc.Quality = 0;
 		depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		depthStencilBufferDesc.CPUAccessFlags = 0;
+		depthStencilBufferDesc.MiscFlags = 0;
 		if (depthStencilTexture != nullptr)
 			depthStencilTexture->Release();
-		D3D11_DEPTH_STENCIL_VIEW_DESC dsvd = {};
-		device->CreateTexture2D(&depthStencilBufferDesc, nullptr, &depthStencilTexture);
-		device->CreateDepthStencilView(depthStencilTexture, &dsvd, &depthStencilView);
+		D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+		descDSV.Format = depthStencilBufferDesc.Format;
+		descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		descDSV.Texture2D.MipSlice = 0;
+		device->CreateTexture2D(&depthStencilBufferDesc, NULL, &depthStencilTexture);
+		device->CreateDepthStencilView(depthStencilTexture, NULL, &depthStencilView);
 		SetViewport((float)width, (float)height);
 		deviceContext->OMSetRenderTargets(1, (ID3D11RenderTargetView**) & renderTargetView, depthStencilView);
 	}
@@ -94,7 +103,7 @@ namespace DEngine
 	void Direct3D11Context::ClearBackBuffer(Vector4 color, float depth, char stencil)
 	{
 		deviceContext->ClearRenderTargetView(renderTargetView, (float*) & color);
-		deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, depth, stencil);
+		deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, depth, stencil);
 	}
 	void Direct3D11Context::CreateDeviceAndContext(D3D_DRIVER_TYPE driverType)
 	{
@@ -126,16 +135,13 @@ namespace DEngine
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 		swapChainDesc.Flags = 0;
-		IDXGISwapChain1* swapChain1;
 		factory->CreateSwapChainForHwnd(
 			device,
 			hwnd,
 			&swapChainDesc,
 			nullptr,
 			nullptr,
-			&swapChain1);
-		swapChain1->QueryInterface<IDXGISwapChain4>(&swapChain);
-		swapChain1->Release();
+			&swapChain);
 		factory->Release();
 	}
 	void Direct3D11Context::SetOMStates()

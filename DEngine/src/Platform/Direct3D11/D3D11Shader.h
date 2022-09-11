@@ -14,8 +14,11 @@ namespace DEngine
 	private:
 		ID3D11Buffer* Data = nullptr;
 	public:
-		virtual void VSSet(const unsigned int slot) const override;
-		virtual void PSSet(const unsigned int slot) const override;
+		void VSSet(const unsigned int slot) const override;
+		void PSSet(const unsigned int slot) const override;
+		void UpdateData(void* data, unsigned int size, unsigned int offset) override;
+		void* GetDataPointer(bool wait) const override;
+		void ReleaseDataPointer() const override;
 		D3D11ShaderData(ID3D11Buffer* data);
 		virtual ~D3D11ShaderData();
 	};
@@ -30,7 +33,7 @@ namespace DEngine
 		ID3D11PixelShader* PixelShader = nullptr;
 		ID3D11InputLayout* InputLayout = nullptr;
 	public:
-		virtual void Bind() const override;
+		void Bind() const override;
 		D3D11Shader(ID3D11VertexShader* vertexShader, ID3D11PixelShader* pixelShader, ID3D11InputLayout* inputLayout);
 		virtual ~D3D11Shader();
 	};

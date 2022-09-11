@@ -33,6 +33,31 @@ namespace DEngine
 		graphicsContext->GetDeviceContext()->PSSetConstantBuffers(slot, 1, &Data);
 	}
 
+	void D3D11ShaderData::UpdateData(void* data, unsigned int size, unsigned int offset)
+	{
+		D3D11_BOX box;
+		ZeroMemory(&box, sizeof(D3D11_BOX));
+		box.bottom = 1;
+		box.back = 1;
+		box.front = 0;
+		box.top = 0;
+		box.left = offset;
+		box.right = offset + size;
+		graphicsContext->GetDeviceContext()->UpdateSubresource1(Data, 0, &box, data, size, 0, D3D11_COPY_DISCARD);
+	}
+
+	void* D3D11ShaderData::GetDataPointer(bool wait) const
+	{
+		D3D11_MAPPED_SUBRESOURCE dms;
+		graphicsContext->GetDeviceContext()->Map(Data, 0, D3D11_MAP_WRITE_DISCARD, wait ? 0 : D3D11_MAP_FLAG_DO_NOT_WAIT, &dms);
+		return dms.pData;
+	}
+
+	void D3D11ShaderData::ReleaseDataPointer() const
+	{
+		graphicsContext->GetDeviceContext()->Unmap(Data, 0);
+	}
+
 	void D3D11Shader::Bind() const
 	{
 		graphicsContext->GetDeviceContext()->VSSetShader(VertexShader, nullptr, 0);

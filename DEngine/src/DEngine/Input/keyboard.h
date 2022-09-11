@@ -3,6 +3,7 @@
 #include <bitset>
 #include <queue>
 
+#include "KeyCodes.h"
 namespace DEngine
 {
 	class keyboard

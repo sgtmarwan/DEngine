@@ -3,6 +3,7 @@
 #include "D3D11GraphicsFactory.h"
 #include "D3D11Shader.h"
 #include "D3D11Mesh.h"
+#include "D3D11VertexBuffer.h"
 #include "D3D11Texture2D.h"
 
 
@@ -23,7 +24,27 @@ namespace DEngine
 	}
 
 	//TODO: ADD MULTPLE SHADER SOURCES SUPPORT
-
+	VertexBuffer* D3D11GraphicsFactory::CreateVertexBuffer(void* vertices, unsigned int stride, unsigned int verticesCount, DATA_USAGE usage) const
+	{
+		ID3D11Buffer* vb;
+		D3D11_BUFFER_DESC bufferDesc = { };
+		D3D11_SUBRESOURCE_DATA sr_data = { };
+		bufferDesc.ByteWidth = stride * verticesCount;
+		bufferDesc.Usage = GetUsage(usage);
+		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bufferDesc.CPUAccessFlags = GetCPUAccessFlags(usage);
+		bufferDesc.MiscFlags = 0;
+		bufferDesc.StructureByteStride = 0;
+		sr_data.SysMemPitch = 0;
+		sr_data.SysMemSlicePitch = 0;
+		sr_data.pSysMem = vertices;
+		graphicsContext->GetDevice()->CreateBuffer(
+			&bufferDesc,
+			&sr_data,
+			&vb);
+		D3D11VertexBuffer* vrtBuf = new D3D11VertexBuffer(vb, stride);
+		return vrtBuf;
+	}
 	ID3D11VertexShader* D3D11GraphicsFactory::CreateVertexShader(void** VSSources, size_t* VSSize, unsigned int VSCount, ID3DBlob** vs_blob_out) const
 	{
 		ID3D11VertexShader* vs;
@@ -48,6 +69,7 @@ namespace DEngine
 		D3D11_INPUT_ELEMENT_DESC* inputElements = new D3D11_INPUT_ELEMENT_DESC[count];
 		for (unsigned int i = 0; i < count; ++i)
 			inputElements[i] = { inputLayout[i].Name, inputLayout[i].Slot, GetInputFormat(inputLayout[i].Format), 0, inputLayout[i].Offset, D3D11_INPUT_PER_VERTEX_DATA, 0};
+
 		graphicsContext->GetDevice()->CreateInputLayout(inputElements, count, vs_blob->GetBufferPointer(), vs_blob->GetBufferSize(), &il);
 		delete[] inputElements;
 		return il;
@@ -81,25 +103,17 @@ namespace DEngine
 		Shader* shader = new D3D11Shader(vs, ps, il);
 		return shader;
 	}
-	Mesh* D3D11GraphicsFactory::CreateMesh(Vertex* vertices, unsigned int verticesCount, unsigned int* indices, unsigned int indicesCount) const
+	Mesh* D3D11GraphicsFactory::CreateMesh(Vertex* vertices, unsigned int verticesCount, unsigned int* indices, unsigned int indicesCount, DATA_USAGE usage) const
 	{
-		ID3D11Buffer* vb;
 		ID3D11Buffer* ib;
 		D3D11_BUFFER_DESC bufferDesc = { };
 		D3D11_SUBRESOURCE_DATA sr_data = { };
-		bufferDesc.ByteWidth = sizeof(Vertex) * verticesCount;
-		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		bufferDesc.CPUAccessFlags = 0;
+		bufferDesc.Usage = GetUsage(usage);
+		bufferDesc.CPUAccessFlags = GetCPUAccessFlags(usage);
 		bufferDesc.MiscFlags = 0;
 		bufferDesc.StructureByteStride = 0;
 		sr_data.SysMemPitch = 0;
 		sr_data.SysMemSlicePitch = 0;
-		sr_data.pSysMem = vertices;
-		graphicsContext->GetDevice()->CreateBuffer(
-			&bufferDesc,
-			&sr_data,
-			&vb);
 		bufferDesc.ByteWidth = sizeof(unsigned int) * indicesCount;
 		bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		sr_data.pSysMem = indices;
@@ -107,10 +121,10 @@ namespace DEngine
 			&bufferDesc,
 			&sr_data,
 			&ib);
-		Mesh* msh = new D3D11Mesh(vb, ib, indicesCount);
+		Mesh* msh = new D3D11Mesh(CreateVertexBuffer(vertices, sizeof(Vertex), verticesCount, usage), ib, indicesCount);
 		return msh;
 	}
-	Texture2D* D3D11GraphicsFactory::CreateTexture2D(void* image, unsigned int width, unsigned int height, TEXTURE2D_FOMAT format, DATA_USAGE usage, unsigned int mipLevels) const
+	Texture2D* D3D11GraphicsFactory::CreateTexture2D(const void* image, unsigned int width, unsigned int height, TEXTURE2D_FOMAT format, DATA_USAGE usage, unsigned int mipLevels) const
 	{
 		ID3D11Texture2D* texture;
 		ID3D11ShaderResourceView* srv;
@@ -226,11 +240,14 @@ D3D11_USAGE GetUsage(DEngine::DATA_USAGE usage)
 	case DEngine::DATA_USAGE::GRW:
 		return D3D11_USAGE_DEFAULT;
 		break;
+	case DEngine::DATA_USAGE::GR_CW:
+		return D3D11_USAGE_DYNAMIC;
+		break;
 	case DEngine::DATA_USAGE::GR:
 		return D3D11_USAGE_IMMUTABLE;
 		break;
-	case DEngine::DATA_USAGE::GR_CW:
-		return D3D11_USAGE_DYNAMIC;
+	case DEngine::DATA_USAGE::GW_CR:
+		return D3D11_USAGE_STAGING;
 		break;
 	default:
 		return D3D11_USAGE_DEFAULT;
@@ -244,11 +261,14 @@ int GetCPUAccessFlags(DEngine::DATA_USAGE usage)
 	case DEngine::DATA_USAGE::GRW:
 		return 0;
 		break;
+	case DEngine::DATA_USAGE::GR_CW:
+		return D3D11_CPU_ACCESS_WRITE;
+		break;
 	case DEngine::DATA_USAGE::GR:
 		return 0;
 		break;
-	case DEngine::DATA_USAGE::GR_CW:
-		return D3D11_CPU_ACCESS_WRITE;
+	case DEngine::DATA_USAGE::GW_CR:
+		return D3D11_CPU_ACCESS_READ;
 		break;
 	default:
 		return 0;

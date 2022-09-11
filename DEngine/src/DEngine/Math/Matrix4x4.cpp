@@ -13,27 +13,81 @@ namespace DEngine
 		{
 			for (int row = 0; row < 4; row++)
 			{
-				matrix[col][row] = value;
+				if (col == row)
+				{
+					matrix[col][row] = value;
+					continue;
+				}
+				matrix[col][row] = 0.0f;
 			}
 		}
 	}
 
+
+	Matrix4x4 Matrix4x4::Rotate(const float& angle, Vector3 rotationAxis)
+	{
+		float const a = angle;
+		float const c = cos(a);
+		float const s = sin(a);
+
+		Vector3 axis = Vector3::Normalize( rotationAxis );
+		Vector3 temp(rotationAxis * (1.0f - c));
+
+		Matrix4x4 out;
+		out[0][0] = c + temp.x * axis.x;
+		out[0][1] = temp.x * axis.y + s * axis.z;
+		out[0][2] = temp.x * axis.z - s * axis.y;
+		out[0][3] = 0.0f;
+		
+		out[1][0] = temp.y * axis.x - s * axis.z;
+		out[1][1] = c + temp.y * axis.y;
+		out[1][2] = temp.y * axis.z + s * axis.x;
+		out[1][3] = 0.0f;
+		
+		out[2][0] = temp.z * axis.x + s * axis.y;
+		out[2][1] = temp.z * axis.y - s * axis.x;
+		out[2][2] = c + temp.z * axis.z;
+		out[2][3] = 0.0f;
+		
+		out[3][0] = 0.0f;
+		out[3][1] = 0.0f;
+		out[3][2] = 0.0f;
+		out[3][3] = 1.0f;
+
+		return out;
+	}
+
+
+
 	Matrix4x4 Matrix4x4::Rotate(const Quaternion& quat)
 	{
 		Matrix4x4 out = Matrix4x4();
-		out[0][0] = 1 - 2 * (quat.Quat.y * quat.Quat.y) - 2 * (quat.Quat.z * quat.Quat.z);
-		out[0][1] = 2 * (quat.Quat.x * quat.Quat.y) + 2 * (quat.Quat.z * quat.Quat.w);
-		out[0][2] = 2 * (quat.Quat.x * quat.Quat.z) + 2 * (quat.Quat.y * quat.Quat.w);
+
+		float x2 = quat.x * quat.x; 
+		float y2 = quat.y * quat.y; 
+		float z2 = quat.z * quat.z; 
+		float xy = quat.x * quat.y; 
+		float xz = quat.x * quat.z; 
+		float yz = quat.y * quat.z; 
+		float wx = quat.w * quat.x; 
+		float wy = quat.w * quat.y;
+		float wz = quat.w * quat.z;
+
+
+
+		out[0][0] = 1.0f - 2.0f * (y2 + z2);
+		out[0][1] = 2.0f * (xy + wz);
+		out[0][2] = 2.0f * (xz - wy);
 		out[0][3] = 0;
 
-		out[1][0] = 2 * (quat.Quat.x * quat.Quat.y) + 2 * (quat.Quat.z * quat.Quat.w);
-		out[1][1] = 1 - 2 * (quat.Quat.x * quat.Quat.x) - 2 * (quat.Quat.z * quat.Quat.z);
-		out[1][2] = 2 * (quat.Quat.y * quat.Quat.z) + 2 * (quat.Quat.x * quat.Quat.w);
+		out[1][0] = 2.0f * (xy - wz);
+		out[1][1] = 1.0f - 2.0f * (x2 + z2);
+		out[1][2] = 2.0f * (yz + wx);
 		out[1][3] = 0;
 
-		out[2][0] = 2 * (quat.Quat.x * quat.Quat.z) + 2 * (quat.Quat.y * quat.Quat.w);
-		out[2][1] = 2 * (quat.Quat.y * quat.Quat.z) + 2 * (quat.Quat.x * quat.Quat.w);
-		out[2][2] = 1 - 2 * (quat.Quat.x * quat.Quat.x) - 2 * (quat.Quat.y * quat.Quat.y);
+		out[2][0] = 2.0f * (xz + wy);
+		out[2][1] = 2.0f * (yz - wx);
+		out[2][2] = 1.0f - 2.0f * (x2 + y2);
 		out[2][3] = 0;
 
 		out[3][0] = 0;
@@ -92,46 +146,11 @@ namespace DEngine
 	}
 
 
-	Matrix4x4 Matrix4x4::View(const Vector3& postion, const Vector3& forward, const Vector3& right, const Vector3& up)
+	Matrix4x4 Matrix4x4::View(const Vector3& position, const Quaternion& rotation)
 	{
-		Matrix4x4 out;
-
-		out[0][0] = right.x;
-		out[0][1] = right.y;
-		out[0][2] = right.z;
-		out[0][3] = 0.0f;
-
-		out[1][0] = up.x;
-		out[1][1] = up.y;
-		out[1][2] = up.z;
-		out[1][3] = 0.0f;
-
-		out[2][0] = forward.x;
-		out[2][1] = forward.y;
-		out[2][2] = forward.z;
-		out[2][3] = 0.0f;
-
-		out[3][0] = postion.x;
-		out[3][1] = postion.y;
-		out[3][2] = postion.z;
-		out[3][3] = 1.0f;
-
-		return out;
+		return Rotate(-rotation) * Translate(-position);
 	}
 
-
-	Matrix4x4 Matrix4x4::Transform(const Vector3& translation, const Vector3& scaling)
-	{
-		Matrix4x4 out(0.0f);
-		out[0][0] = scaling.x;
-		out[1][1] = scaling.y;
-		out[2][2] = scaling.z;
-		out[3][0] = translation.x;
-		out[3][1] = translation.y;
-		out[3][2] = translation.z;
-		out[3][3] = 1.0f;
-		return out;
-	}
 	Matrix4x4 Matrix4x4::Translate(const Vector3& translation)
 	{
 		Matrix4x4 out(0.0f);

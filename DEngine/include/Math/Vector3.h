@@ -1,8 +1,11 @@
 #pragma once
 #include "DEngineAPI.h"
 
+
+
 namespace DEngine
 {
+	class Quaternion;
 	struct DEAPI Vector3
 	{
 	public:
@@ -13,10 +16,13 @@ namespace DEngine
 		Vector3(float value);
 
 		Vector3 operator* (const Vector3& vec) const;
+		Quaternion operator* (const Quaternion& quat) const;
 		Vector3 operator* (const float& value) const;
+		Vector3 operator/ (const float& value) const;
 		Vector3 operator- (const Vector3& vec) const;
+		Vector3 operator- () const;
 		Vector3 operator+ (const Vector3& vec) const;
-		Vector3 operator+= (const Vector3& vec) const;
+		void operator+= (const Vector3& vec);
 
 		void Normalize();
 		float Length() const;
@@ -25,6 +31,8 @@ namespace DEngine
 		static const Vector3 Up;
 		static const Vector3 Right;
 		static const Vector3 Forward;
+
+		static const Vector3 Zero;
 
 	public:
 		static float DotProduct(const Vector3& vec1, const Vector3& vec2);

@@ -10,8 +10,9 @@ namespace DEngine
 	private:
 		ID3D11Device5* device = nullptr;
 		ID3D11DeviceContext4* deviceContext = nullptr;
-		IDXGISwapChain4* swapChain = nullptr;
+		IDXGISwapChain1* swapChain = nullptr;
 		ID3D11RenderTargetView1* renderTargetView = nullptr;
+		ID3D11Texture2D* frameBuffer = nullptr;
 		ID3D11Texture2D* depthStencilTexture = nullptr;
 		ID3D11DepthStencilView* depthStencilView = nullptr;
 		ID3D11DepthStencilState* depthStencilState = nullptr;

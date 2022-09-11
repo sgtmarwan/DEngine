@@ -1,11 +1,14 @@
 #include <cmath>
+
 #include "Math/Vector3.h"
+#include "Math/Quaternion.h"
 namespace DEngine
 {
 
 	const Vector3 Vector3::Up = Vector3(0.0f, 1.0f, 0.0f);
 	const Vector3 Vector3::Right = Vector3(1.0f, 0.0f, 0.0f);
-	const Vector3 Vector3::Forward = Vector3(0.0f, 0.0f, 1.0f);;
+	const Vector3 Vector3::Forward = Vector3(0.0f, 0.0f, 1.0f);
+	const Vector3 Vector3::Zero = Vector3(0.0f, 0.0f, 0.0f);
 
 
 	Vector3::Vector3(float _x, float _y, float _z) : 
@@ -31,9 +34,20 @@ namespace DEngine
 		return Vector3((y * vec.z) - (z * vec.y), (z * vec.x) - (x * vec.z), (x * vec.y) - (y * vec.x));
 	}
 
+
 	Vector3 Vector3::operator*(const float& value) const
 	{
 		return Vector3(x * value, y * value, z * value);
+	}
+
+	Quaternion Vector3::operator*(const Quaternion& quat) const
+	{
+		return Quaternion(x, y, z, 0.0f) * quat;
+	}
+
+	Vector3 Vector3::operator/(const float& value) const
+	{
+		return Vector3(x / value, y / value, z / value);
 	}
 
 	Vector3 Vector3::operator-(const Vector3& vec) const
@@ -41,14 +55,21 @@ namespace DEngine
 		return Vector3(x - vec.x, y - vec.y, z - vec.z);
 	}
 
+	Vector3 Vector3::operator-() const
+	{
+		return Vector3(-x, -y, -z);
+	}
+
 	Vector3 Vector3::operator+(const Vector3& vec) const
 	{
 		return Vector3(x + vec.x, y + vec.y, z + vec.z);
 	}
 
-	Vector3 Vector3::operator+=(const Vector3& vec) const
+	void Vector3::operator+=(const Vector3& vec)
 	{
-		return Vector3(x + vec.x, y + vec.y, z + vec.z);
+		x += vec.x;
+		y += vec.y;
+		z += vec.z;
 	}
 
 	float Vector3::Length() const

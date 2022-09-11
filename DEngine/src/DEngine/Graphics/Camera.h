@@ -1,20 +1,33 @@
 #pragma once
-#include "DEngine/Core/Transform.h"
 #include "Math/Matrix4x4.h"
+
+#include "DEngine/Core/Component.h"
 
 namespace DEngine
 {
-	class Camera
+	enum class ProjectionMode
 	{
+		Prespective, Orthographic
+	};
+	class Camera : public Component
+	{
+		Camera() = delete;
 	private:
-		Transform transform;
-		Matrix4x4 ViewMatrix;
+		Matrix4x4 ProjectionMatrix;
+		float AspectRatio;
+		ProjectionMode Mode;
+		float Fov, ZNear, ZFar;
+		float fTan;
 	public:
-		Camera(const Vector3& pos, const Quaternion& orien);
-		~Camera() = default;
+		Camera(Entity* e ,ProjectionMode mode, int _width, int _height, float _fov, float zNear, float zFar);
+		virtual ~Camera() = default;
 
-		void SetPosition(const Vector3& pos);
-		void TranslatePosition(const Vector3& translation);
-		Matrix4x4 GetViewMatrix();
+		void SetRes(int width, int height);
+		void SetZ(const float& znear, const float& zfar);
+		void SetFov(const float& fov);
+		Matrix4x4 GetProjectionMatrix() const { return ProjectionMatrix; }
+
+		void Start() override;
+		void Update() override;
 	};
 }

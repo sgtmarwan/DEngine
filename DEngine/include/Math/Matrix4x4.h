@@ -27,10 +27,10 @@ namespace DEngine
 	public:
 		static Matrix4x4 Transpose(const Matrix4x4& mat);
 		static Matrix4x4 PrespectiveProjection(const float aspectRatio, const float fov, const float zNear, const float zFar);
-		static Matrix4x4 View(const Vector3& postion, const Vector3& forward, const Vector3& right, const Vector3& up);
-		static Matrix4x4 Transform(const Vector3& translation, const Vector3& scaling);
+		static Matrix4x4 View(const Vector3& position, const Quaternion& rotaion);
 		static Matrix4x4 Translate(const Vector3& translation);
 		static Matrix4x4 Rotate(const Quaternion& quat);
+		static Matrix4x4 Rotate(const float& angle, Vector3 rotationAxis);
 		static Matrix4x4 Scale(const Vector3& scaling);
 	};
 }

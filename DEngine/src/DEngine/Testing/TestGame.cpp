@@ -9,7 +9,6 @@
 #include "Math/Quaternion.h"
 
 
-
 constexpr float PI = 22.0f / 7.0f;
 constexpr float deg2rad = PI / 180.0f;
 
@@ -58,13 +57,11 @@ namespace DEngine
 
 	void TestGame::Run(Vertex* verts, unsigned int vertsCount, unsigned int* ind, unsigned int count, char** vs, unsigned int vsc, char** ps, unsigned int psc, INPUT_LAYOUT* il, unsigned int ilc, void* image, unsigned int width, unsigned int height, unsigned int cc)
 	{
-		Matrix4x4* color = new Matrix4x4();
-		Quaternion quat = Quaternion(Vector3::Forward, 90.0f * deg2rad);
+		Matrix4x4* color = new Matrix4x4[5];
+		Quaternion quat = Quaternion(Vector3::Normalize(Vector3(0.0f, 1.0f, 1.0f)), 45.0f * deg2rad);
 		Matrix4x4 rot = Matrix4x4::Rotate(quat);
-		*color = rot;//* Matrix4x4::PrespectiveProjection(720.f/1280.0f,  90.0f * deg2rad, 0.5f, 10.0f) ;
-
-
-
+		Camera cam(Vector3(0, 0, -2), Quaternion(Vector3::Normalize(Vector3(0.0f, 1.0f, 0.0f)), 0.0f), DEngine::ProjectionMode::Prespective, 1280, 720, 90, 0.5, 10);
+		color[0] = cam.GetProjectionMatrix() * cam.GetViewMatrix() * (Matrix4x4::Translate(Vector3(0.0f, 0, 0)) * rot * Matrix4x4::Scale(Vector3(1)));
 		Mesh* mesh = gf->CreateMesh(verts, vertsCount, ind, count);
 		size_t* vs_s, * ps_s;
 		void** vs_sources = ReadSource(vs, vsc, &vs_s);
@@ -76,12 +73,106 @@ namespace DEngine
 		shader->Bind();
 		tex->PSSet(0);
 		sampl->PSSet(0);
-		ShaderData* psData = gf->CreateShaderData((void*) color, sizeof(Matrix4x4), DATA_USAGE::GR_CW);
+		ShaderData* psData = gf->CreateShaderData((void*) color, 5 * sizeof(Matrix4x4), DATA_USAGE::GR_CW);
 		psData->VSSet(0);
 		wnd->Show();
+		float movev = 0;
+		float moveh = 0;
+		float movez = 0;
+		float c = 0.1;
+		float v = 0.1;
+		float t = 45;
 		while (wnd->Update())
 		{
-			gc->ClearBackBuffer({ 1.0f, 0.8f, 0.4f, 1.0f }, 1, 0);
+			{
+				if (kbd->IsKeyDown(DEKC_UP))
+				{
+					movev += 0.01f;
+					*color = cam.GetProjectionMatrix() * cam.GetViewMatrix() * (Matrix4x4::Translate(Vector3(0.0f + moveh, 0 + movev, 0 + movez)) * rot * Matrix4x4::Scale(Vector3(1)));
+					memcpy(psData->GetDataPointer(true), color, sizeof(Matrix4x4));
+					psData->ReleaseDataPointer();
+				}
+				if (kbd->IsKeyDown(DEKC_DOWN))
+				{
+					movev -= 0.01f;
+					*color = cam.GetProjectionMatrix() * cam.GetViewMatrix() * (Matrix4x4::Translate(Vector3(0.0f + moveh, 0 + movev, 0 + movez)) * rot * Matrix4x4::Scale(Vector3(1)));
+					memcpy(psData->GetDataPointer(true), color, sizeof(Matrix4x4));
+					psData->ReleaseDataPointer();
+				}
+				if (kbd->IsKeyDown(DEKC_RIGHT))
+				{
+					moveh += 0.01f;
+					*color = cam.GetProjectionMatrix() * cam.GetViewMatrix() * (Matrix4x4::Translate(Vector3(0.0f + moveh, 0 + movev, 0 + movez)) * rot * Matrix4x4::Scale(Vector3(1)));
+					memcpy(psData->GetDataPointer(true), color, sizeof(Matrix4x4));
+					psData->ReleaseDataPointer();
+				}
+				if (kbd->IsKeyDown(DEKC_LEFT))
+				{
+					moveh -= 0.01f;
+					*color = cam.GetProjectionMatrix() * cam.GetViewMatrix() * (Matrix4x4::Translate(Vector3(0.0f + moveh, 0 + movev, 0 + movez)) * rot * Matrix4x4::Scale(Vector3(1)));
+					memcpy(psData->GetDataPointer(true), color, sizeof(Matrix4x4));
+					psData->ReleaseDataPointer();
+				}
+				if (kbd->IsKeyDown('E'))
+				{
+					movez += 0.01f;
+					*color = cam.GetProjectionMatrix() * cam.GetViewMatrix() * (Matrix4x4::Translate(Vector3(0.0f + moveh, 0 + movev, 0 + movez)) * rot * Matrix4x4::Scale(Vector3(1)));
+					memcpy(psData->GetDataPointer(true), color, sizeof(Matrix4x4));
+					psData->ReleaseDataPointer();
+				}
+				if (kbd->IsKeyDown('R'))
+				{
+					movez -= 0.01f;
+					*color = cam.GetProjectionMatrix() * cam.GetViewMatrix() * (Matrix4x4::Translate(Vector3(0.0f + moveh, 0 + movev, 0 + movez)) * rot * Matrix4x4::Scale(Vector3(1)));
+					memcpy(psData->GetDataPointer(true), color, sizeof(Matrix4x4));
+					psData->ReleaseDataPointer();
+				}
+				if (kbd->IsKeyDown('Z'))
+				{
+					t += 0.5;
+					quat = Quaternion(Vector3::Normalize(Vector3(0.0f, 1.0f, 0.0f)), t * deg2rad);
+					rot = Matrix4x4::Rotate(quat);
+					*color = cam.GetProjectionMatrix() * cam.GetViewMatrix() * (Matrix4x4::Translate(Vector3(0.0f + moveh, 0 + movev, 0 + movez)) * rot * Matrix4x4::Scale(Vector3(1)));
+					memcpy(psData->GetDataPointer(true), color, sizeof(Matrix4x4));
+					psData->ReleaseDataPointer();
+				}
+				if (kbd->IsKeyDown('S'))
+				{
+					t -= 0.5;
+					quat = Quaternion(Vector3::Normalize(Vector3(0.0f, 1.0f, 0.0f)), t * deg2rad);
+					rot = Matrix4x4::Rotate(quat);
+					*color = cam.GetProjectionMatrix() * cam.GetViewMatrix() * (Matrix4x4::Translate(Vector3(0.0f + moveh, 0 + movev, 0 + movez)) * rot * Matrix4x4::Scale(Vector3(1)));
+					memcpy(psData->GetDataPointer(true), color, sizeof(Matrix4x4));
+					psData->ReleaseDataPointer();
+				}
+			}
+			{
+				if (kbd->IsKeyDown('C'))
+				{
+					cam.Rotate(Quaternion(Vector3::Up, -c * 2 * deg2rad));
+					*color = cam.GetProjectionMatrix() * cam.GetViewMatrix() * (Matrix4x4::Translate(Vector3(0.0f + moveh, 0 + movev, 0 + movez)) * rot * Matrix4x4::Scale(Vector3(1)));
+					psData->UpdateData(color, 1 * sizeof(Matrix4x4), 0);
+				}
+				if (kbd->IsKeyDown('V'))
+				{
+					cam.Rotate(Quaternion(Vector3::Up, c * 2 * deg2rad));
+					*color = cam.GetProjectionMatrix() * cam.GetViewMatrix() * (Matrix4x4::Translate(Vector3(0.0f + moveh, 0 + movev, 0 + movez)) * rot * Matrix4x4::Scale(Vector3(1)));
+					psData->UpdateData(color, 1 * sizeof(Matrix4x4), 0);
+				}
+				if (kbd->IsKeyDown('W'))
+				{
+					cam.Rotate(Quaternion(Vector3::Right, v * 2 * deg2rad));
+					*color = cam.GetProjectionMatrix() * cam.GetViewMatrix() * (Matrix4x4::Translate(Vector3(0.0f + moveh, 0 + movev, 0 + movez)) * rot * Matrix4x4::Scale(Vector3(1)));
+					psData->UpdateData(color, 1 * sizeof(Matrix4x4), 0);
+				}
+				if (kbd->IsKeyDown('X'))
+				{
+					cam.Rotate(Quaternion(Vector3::Right, -v * 2 * deg2rad));
+					*color = cam.GetProjectionMatrix() * cam.GetViewMatrix() * (Matrix4x4::Translate(Vector3(0.0f + moveh, 0 + movev, 0 + movez)) * rot * Matrix4x4::Scale(Vector3(1)));
+					psData->UpdateData(color, 1 * sizeof(Matrix4x4), 0);
+				}
+			}
+			gc->ClearBackBuffer({ 1.0f, 0.8f, 0.4f, 1.0f }, 1.0f, 0);
 			gc->Draw(mesh->GetIndicesCount());
 			gc->PresentFrame();
 		}
