@@ -3,7 +3,7 @@
 namespace DEngine
 {
 	GraphicsContext::GraphicsContext(unsigned short backBufferCount, unsigned short vsync) :
-		BackBufferCount(backBufferCount), Vsync(vsync)
+		m_BackBufferCount(backBufferCount), m_Vsync(vsync)
 	{
 	}
 }

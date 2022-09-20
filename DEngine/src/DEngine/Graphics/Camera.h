@@ -1,15 +1,13 @@
 #pragma once
 #include "Math/Matrix4x4.h"
 
-#include "DEngine/Core/Component.h"
-
 namespace DEngine
 {
 	enum class ProjectionMode
 	{
 		Prespective, Orthographic
 	};
-	class Camera : public Component
+	class Camera
 	{
 		Camera() = delete;
 	private:
@@ -19,7 +17,7 @@ namespace DEngine
 		float Fov, ZNear, ZFar;
 		float fTan;
 	public:
-		Camera(Entity* e ,ProjectionMode mode, int _width, int _height, float _fov, float zNear, float zFar);
+		Camera(ProjectionMode mode, int _width, int _height, float _fov, float zNear, float zFar);
 		virtual ~Camera() = default;
 
 		void SetRes(int width, int height);
@@ -27,7 +25,5 @@ namespace DEngine
 		void SetFov(const float& fov);
 		Matrix4x4 GetProjectionMatrix() const { return ProjectionMatrix; }
 
-		void Start() override;
-		void Update() override;
 	};
 }

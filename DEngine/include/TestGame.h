@@ -4,9 +4,10 @@
 #include "Platform/Windows/WinWindow.h"
 #include "Platform/Direct3D11/Direct3D11Context.h"
 #include "Platform/Direct3D11/D3D11GraphicsFactory.h"
-#include "Platform/Direct3D11/D3D11Mesh.h"
+#include "DEngine/Graphics/Mesh.h"
 #include "Platform/Direct3D11/D3D11Shader.h"
 #include "Platform/Direct3D11/D3D11Texture2D.h"
+#include "DEngine/Graphics/Buffer.h"
 #include "DEngine/Input/keyboard.h"
 #include "DEngine/Input/mouse.h"
 namespace DEngine

@@ -146,15 +146,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\DEngine\ECS\EntityManager.h" />
+    <ClInclude Include="src\DEngine\ECS\ComponentPoll.h" />
+    <ClInclude Include="src\DEngine\Graphics\GraphicsFactory.h" />
+    <ClInclude Include="src\DEngine\Graphics\Vertex.h" />
+    <ClInclude Include="src\Platform\Direct3D11\D3D11GraphicsFactory.h" />
+    <ClInclude Include="src\Platform\Direct3D11\D3D11_INPUT_LAYOUT.h" />
+    <ClInclude Include="src\Platform\Direct3D11\D3D11_DATA_USAGE.h" />
+    <ClInclude Include="src\DEngine\Graphics\DATA_USAGE.h" />
+    <ClInclude Include="src\Platform\Direct3D11\D3D11Sampler.h" />
+    <ClInclude Include="src\DEngine\Graphics\Sampler.h" />
+    <ClInclude Include="src\DEngine\Graphics\Resource.h" />
     <ClInclude Include="src\DEngine\Graphics\MeshData.h" />
     <ClInclude Include="src\DEngine\Graphics\Material.h" />
     <ClInclude Include="src\DEngine\Graphics\MeshRenderer.h" />
     <ClInclude Include="src\DEngine\Graphics\Renderer.h" />
-    <ClInclude Include="src\DEngine\Core\Component.h" />
     <ClInclude Include="src\DEngine\Core\Entity.h" />
     <ClInclude Include="include\DEngine.h" />
     <ClInclude Include="include\Math\Quaternion.h" />
-    <ClInclude Include="src\DEngine\Graphics\VertexBuffer.h" />
+    <ClInclude Include="src\DEngine\Graphics\Buffer.h" />
     <ClInclude Include="src\DEngine\Input\keyboard.h" />
     <ClInclude Include="src\DEngine\Input\KeyCodes.h" />
     <ClInclude Include="include\Math\Matrix4x4.h" />
@@ -163,17 +173,13 @@
     <ClInclude Include="src\DEngine\Graphics\Camera.h" />
     <ClInclude Include="src\DEngine\Graphics\Mesh.h" />
     <ClInclude Include="src\DEngine\Graphics\Texture2D.h" />
-    <ClInclude Include="src\DEngine\Graphics\Vertex.h" />
     <ClInclude Include="include\TestGame.h" />
     <ClInclude Include="src\DEngine\Input\mouse.h" />
-    <ClInclude Include="src\Platform\Direct3D11\D3D11GraphicsFactory.h" />
-    <ClInclude Include="src\DEngine\Graphics\GraphicsFactory.h" />
-    <ClInclude Include="src\Platform\Direct3D11\D3D11Mesh.h" />
     <ClInclude Include="src\Platform\Direct3D11\D3D11Shader.h" />
     <ClInclude Include="src\DEngine\Graphics\INPUT_LAYOUT.h" />
     <ClInclude Include="src\DEngine\Graphics\Shader.h" />
     <ClInclude Include="src\Platform\Direct3D11\D3D11Texture2D.h" />
-    <ClInclude Include="src\Platform\Direct3D11\D3D11VertexBuffer.h" />
+    <ClInclude Include="src\Platform\Direct3D11\D3D11Buffer.h" />
     <ClInclude Include="src\Platform\Direct3D11\Direct3D11Context.h" />
     <ClInclude Include="src\DEngine\Graphics\GraphicsContext.h" />
     <ClInclude Include="include\DEngineAPI.h" />
@@ -186,17 +192,25 @@
     <ClInclude Include="src\DEngine\Testing\TestMaterial.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\DEngine\ECS\EntityManager.cpp" />
+    <ClCompile Include="src\DEngine\ECS\ComponentPoll.cpp" />
+    <ClCompile Include="src\DEngine\Graphics\GraphicsFactory.cpp" />
+    <ClCompile Include="src\Platform\Direct3D11\D3D11GraphicsFactory.cpp" />
+    <ClCompile Include="src\Platform\Direct3D11\D3D11_INPUT_LAYOUT.cpp" />
+    <ClCompile Include="src\Platform\Direct3D11\D3D11_DATA_USAGE.cpp" />
+    <ClCompile Include="src\Platform\Direct3D11\D3D11Sampler.cpp" />
+    <ClCompile Include="src\DEngine\Graphics\Sampler.cpp" />
+    <ClCompile Include="src\DEngine\Graphics\Resource.cpp" />
     <ClCompile Include="src\DEngine\DEngine.cpp" />
     <ClCompile Include="src\DEngine\Graphics\Material.cpp" />
     <ClCompile Include="src\DEngine\Graphics\MeshData.cpp" />
     <ClCompile Include="src\DEngine\Graphics\MeshRenderer.cpp" />
     <ClCompile Include="src\DEngine\Graphics\Renderer.cpp" />
-    <ClCompile Include="src\DEngine\Core\Component.cpp" />
     <ClCompile Include="src\DEngine\Core\Entity.cpp" />
     <ClCompile Include="src\DEngine\Graphics\Camera.cpp" />
     <ClCompile Include="src\DEngine\Graphics\Mesh.cpp" />
     <ClCompile Include="src\DEngine\Graphics\Texture2D.cpp" />
-    <ClCompile Include="src\DEngine\Graphics\VertexBuffer.cpp" />
+    <ClCompile Include="src\DEngine\Graphics\Buffer.cpp" />
     <ClCompile Include="src\DEngine\Input\keyboard.cpp" />
     <ClCompile Include="src\DEngine\Input\mouse.cpp" />
     <ClCompile Include="src\DEngine\Math\Matrix4x4.cpp" />
@@ -205,13 +219,10 @@
     <ClCompile Include="src\DEngine\Math\Vector3.cpp" />
     <ClCompile Include="src\DEngine\Math\Vector4.cpp" />
     <ClCompile Include="src\DEngine\Testing\TestGame.cpp" />
-    <ClCompile Include="src\Platform\Direct3D11\D3D11GraphicsFactory.cpp" />
-    <ClCompile Include="src\DEngine\Graphics\GraphicsFactory.cpp" />
-    <ClCompile Include="src\Platform\Direct3D11\D3D11Mesh.cpp" />
     <ClCompile Include="src\Platform\Direct3D11\D3D11Shader.cpp" />
     <ClCompile Include="src\DEngine\Graphics\Shader.cpp" />
     <ClCompile Include="src\Platform\Direct3D11\D3D11Texture2D.cpp" />
-    <ClCompile Include="src\Platform\Direct3D11\D3D11VertexBuffer.cpp" />
+    <ClCompile Include="src\Platform\Direct3D11\D3D11Buffer.cpp" />
     <ClCompile Include="src\Platform\Direct3D11\Direct3D11Context.cpp" />
     <ClCompile Include="src\DEngine\Graphics\GraphicsContext.cpp" />
     <ClCompile Include="src\Platform\Windows\WinWindow.cpp" />

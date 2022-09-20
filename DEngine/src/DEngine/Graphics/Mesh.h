@@ -1,24 +1,22 @@
 #pragma once
-#include "VertexBuffer.h"
+#include "Vertex.h"
+#include "Buffer.h"
 namespace DEngine
 {
 	class Mesh
 	{
-	protected:
-		VertexBuffer* VB;
-		unsigned int IndicesCount;
+	private:
+		Buffer* m_VertexBuffer;
+		Buffer* m_IndexBuffer;
+		unsigned int m_IndicesCount;
 	public:
-		Mesh(VertexBuffer* vb, unsigned int ic);
+		Mesh() = delete;
+
+
+		Mesh(Buffer* vb, Buffer* ib, unsigned int ic);
+		Mesh(const Vertex* vertices, unsigned int verticesCount, const unsigned int* indices, unsigned int indicesCount);
 		unsigned int GetIndicesCount();
-		virtual void Bind(const unsigned int slot) const = 0;
+		virtual void Bind(const unsigned int slot);
 		virtual ~Mesh() = default;
-
-		void VBUpdateData(void* data, unsigned int size, unsigned int offset);
-		void* VBGetDataPointer(bool wait) const;
-		void VBReleaseDataPointer() const;
-
-		virtual void IBUpdateData(void* data, unsigned int size, unsigned int offset) = 0;
-		virtual void* IBGetDataPointer(bool wait) const = 0;
-		virtual void IBReleaseDataPointer() const = 0;
 	};
 }

@@ -12,15 +12,15 @@ namespace DEngine
 	{
 		shader = sh;
 	}
-	Shader* TestMaterial::GetShader()
+	unsigned int TestMaterial::GetShaderId()
 	{
-		return shader;
+		return shader->GetId();
 	}
-	TestMaterial::TestMaterial(const MVP& _mvp, const void* _texture, unsigned int width, unsigned int height, TEXTURE2D_FOMAT format)
+	TestMaterial::TestMaterial(const MVP& _mvp, const void* _texture, unsigned int width, unsigned int height, TEXTURE2D_FORMAT format)
 	{
-		mvp = graphicsFactory->CreateShaderData((void*)&_mvp, sizeof(MVP), DATA_USAGE::GR_CW);
-		texture = graphicsFactory->CreateTexture2D(_texture, width, height, format, DATA_USAGE::GRW, 0);
-		smpl = graphicsFactory->CreateSampler();
+		mvp = GraphicsFactory::Get()->CreateBuffer((void*)&_mvp, sizeof(MVP), DATA_USAGE::GR_CW, BUFFER_TYPE::ShaderBuffer);
+		texture = GraphicsFactory::Get()->CreateTexture2D(_texture, width, height, format, DATA_USAGE::GRW, 0);
+		smpl = GraphicsFactory::Get()->CreateSampler();
 	}
 	void TestMaterial::Bind()
 	{
@@ -32,8 +32,8 @@ namespace DEngine
 
 	void TestMaterial::SetMVP(const MVP& _mvp)
 	{
-		memcpy(mvp->GetDataPointer(true), &_mvp, sizeof(MVP));
-		mvp->ReleaseDataPointer();
+		memcpy(mvp->Map(true), &_mvp, sizeof(MVP));
+		mvp->UnMap();
 	}
 }
 

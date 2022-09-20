@@ -1,13 +1,7 @@
 #include "Direct3D11Context.h"
-#include "D3D11Shader.h"
-#include "D3D11Mesh.h"
-#include "D3D11Texture2D.h"
-
-
-
-#include <iostream>
 namespace DEngine
 {
+	Direct3D11Context* Direct3D11Context::s_GraphicsContext = nullptr;
 	Direct3D11Context::Direct3D11Context(const HWND& hWnd, unsigned short backBufferCount, unsigned short vsync) :
 		GraphicsContext(backBufferCount, vsync)
 	{
@@ -38,7 +32,7 @@ namespace DEngine
 	{
 		deviceContext->DrawIndexed(indicesCount, 0, 0);
 	}
-	void Direct3D11Context::ChangeRes(unsigned int width, unsigned int height)
+	void Direct3D11Context::SetRes(unsigned int width, unsigned int height)
 	{
 		DXGI_MODE_DESC dmd = {};
 		dmd.Width = width;
@@ -50,8 +44,6 @@ namespace DEngine
 		dmd.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		swapChain->ResizeTarget(&dmd);
 	}
-
-
 	void Direct3D11Context::Resize(unsigned int width, unsigned int height)
 	{
 		if (renderTargetView != nullptr)
@@ -60,7 +52,7 @@ namespace DEngine
 			depthStencilView->Release();
 		if (frameBuffer != nullptr)
 			frameBuffer->Release();
-		swapChain->ResizeBuffers(BackBufferCount, width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+		swapChain->ResizeBuffers(m_BackBufferCount, width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 		swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&frameBuffer));
 		device->CreateRenderTargetView1(frameBuffer, nullptr, &renderTargetView);
 		D3D11_TEXTURE2D_DESC depthStencilBufferDesc = {};
@@ -88,9 +80,9 @@ namespace DEngine
 	}
 	void Direct3D11Context::PresentFrame()
 	{
-		swapChain->Present1(Vsync, 0u, &presentParameters);
+		swapChain->Present1(m_Vsync, 0u, &presentParameters);
 		deviceContext->OMSetRenderTargets(1, (ID3D11RenderTargetView**)&renderTargetView, depthStencilView);
-		CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
+		m_CurrentBackBuffer = (m_CurrentBackBuffer + 1) % m_BackBufferCount;
 	}
 	ID3D11Device5* Direct3D11Context::GetDevice()
 	{
@@ -100,10 +92,13 @@ namespace DEngine
 	{
 		return deviceContext;
 	}
-	void Direct3D11Context::ClearBackBuffer(Vector4 color, float depth, char stencil)
+	void Direct3D11Context::ClearBackBuffer(const Vector4& color)
 	{
 		deviceContext->ClearRenderTargetView(renderTargetView, (float*) & color);
-		deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, depth, stencil);
+	}
+	void Direct3D11Context::ClearDepthBuffer(float depth)
+	{
+		deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, depth, 0);
 	}
 	void Direct3D11Context::CreateDeviceAndContext(D3D_DRIVER_TYPE driverType)
 	{
@@ -130,7 +125,7 @@ namespace DEngine
 		swapChainDesc.Stereo = FALSE;
 		swapChainDesc.SampleDesc = { 1, 0 };
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		swapChainDesc.BufferCount = BackBufferCount;
+		swapChainDesc.BufferCount = m_BackBufferCount;
 		swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
@@ -186,5 +181,13 @@ namespace DEngine
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 		deviceContext->RSSetViewports(1, &viewport);
+	}
+	Direct3D11Context* Direct3D11Context::Get()
+	{
+		return s_GraphicsContext;
+	}
+	void Direct3D11Context::Set(Direct3D11Context* gc)
+	{
+		s_GraphicsContext = gc;
 	}
 }

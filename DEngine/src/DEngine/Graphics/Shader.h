@@ -1,24 +1,20 @@
 #pragma once
+#include "Texture2D.h"
+#include "Buffer.h"
+#include "Sampler.h"
 namespace DEngine
 {
 	class Shader
 	{
 	protected:
-
+		unsigned int m_Id;
 	public:
+		Shader();
 		virtual void Bind() const = 0;
 		virtual ~Shader() = default;
-	};
 
-	class ShaderData
-	{
-	public:
-		virtual void VSSet(const unsigned int slot) const = 0;
-		virtual void PSSet(const unsigned int slot) const = 0;
-		virtual void UpdateData(void* data, unsigned int size, unsigned int offset) = 0;
-		virtual void* GetDataPointer(bool wait) const = 0;
-		virtual void ReleaseDataPointer() const = 0;
-		virtual ~ShaderData() = default;
+		unsigned int GetId() const;
 	};
 }
+
 

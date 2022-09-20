@@ -2,32 +2,10 @@
 #include <d3d11_4.h>
 
 #include "DEngine/Graphics/Shader.h"
-#include "Platform/Direct3D11/Direct3D11Context.h"
 namespace DEngine
 {
-	class D3D11ShaderData : public ShaderData
-	{
-	private:
-		static Direct3D11Context* graphicsContext;
-	public:
-		static void SetGraphicsContext(Direct3D11Context* gc);
-	private:
-		ID3D11Buffer* Data = nullptr;
-	public:
-		void VSSet(const unsigned int slot) const override;
-		void PSSet(const unsigned int slot) const override;
-		void UpdateData(void* data, unsigned int size, unsigned int offset) override;
-		void* GetDataPointer(bool wait) const override;
-		void ReleaseDataPointer() const override;
-		D3D11ShaderData(ID3D11Buffer* data);
-		virtual ~D3D11ShaderData();
-	};
 	class D3D11Shader : public Shader
 	{
-	private:
-		static Direct3D11Context* graphicsContext;
-	public:
-		static void SetGraphicsContext(Direct3D11Context* gc);
 	private:
 		ID3D11VertexShader* VertexShader = nullptr;
 		ID3D11PixelShader* PixelShader = nullptr;

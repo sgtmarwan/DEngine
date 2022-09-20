@@ -1,6 +1,6 @@
 cbuffer b : register(b0)
 {
-	unsigned int inds[4096];
+	float4x4 mvp;
 }
 
 

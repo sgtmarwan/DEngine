@@ -5,22 +5,27 @@
 #include "Texture2D.h"
 namespace DEngine
 {
+	enum class GraphicsAPI
+	{
+		Direct3D11 = 0
+	};
 	class GraphicsContext
 	{
 		friend class WinWindow;
 	protected:
-		unsigned short BackBufferCount;
-		unsigned short Vsync;
-		unsigned short CurrentBackBuffer = 0;
+		unsigned short m_BackBufferCount;
+		unsigned short m_Vsync;
+		unsigned short m_CurrentBackBuffer = 0;
 	protected:
 		virtual void Resize(unsigned int width, unsigned int height) = 0;
 	public:
 		virtual ~GraphicsContext() = default;
 		GraphicsContext(unsigned short backBufferCount, unsigned short vsync);
 		virtual void PresentFrame() = 0;
-		virtual void ChangeRes(unsigned int width, unsigned int height) = 0;
+		virtual void SetRes(unsigned int width, unsigned int height) = 0;
 		virtual void Draw(unsigned int indicesCount) const = 0;
-		virtual void ClearBackBuffer(Vector4 color, float depth, char stencil) = 0;
+		virtual void ClearBackBuffer(const Vector4& color) = 0;
+		virtual void ClearDepthBuffer(float depth) = 0;
 	};
 }
 

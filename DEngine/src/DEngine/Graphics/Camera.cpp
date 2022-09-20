@@ -4,8 +4,8 @@
 namespace DEngine
 {
 
-	Camera::Camera(Entity* e, ProjectionMode mode, int _width, int _height, float _fov, float zNear, float zFar) :
-		Component(e), Fov(_fov), ZNear(zNear), ZFar(zFar)
+	Camera::Camera(ProjectionMode mode, int _width, int _height, float _fov, float zNear, float zFar) :
+		Fov(_fov), ZNear(zNear), ZFar(zFar)
 	{
 		AspectRatio = float(_height) / _width;
 		fTan = tan(Fov / 2.0f);;
@@ -32,12 +32,5 @@ namespace DEngine
 		fTan = tan(Fov / 2.0f);
 		ProjectionMatrix[0][0] = fTan * AspectRatio;
 		ProjectionMatrix[1][1] = fTan;
-	}
-	void Camera::Start()
-	{
-
-	}
-	void Camera::Update()
-	{
 	}
 }

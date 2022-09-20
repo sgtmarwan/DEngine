@@ -6,11 +6,7 @@ namespace DEngine
 	class Material
 	{
 	protected:
-		static const GraphicsFactory* graphicsFactory;
-	public:
-		static void SetGraphicsFactory(const GraphicsFactory* gf);
-	protected:
-		virtual Shader* GetShader();
+		virtual unsigned int GetShaderId() =  0;
 	public:
 		virtual void Bind() = 0;
 

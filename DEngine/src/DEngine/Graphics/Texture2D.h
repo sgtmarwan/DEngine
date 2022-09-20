@@ -1,26 +1,17 @@
 #pragma once
+#include "Resource.h"
 
 namespace DEngine {
 
-	enum class TEXTURE2D_FOMAT
+	enum class TEXTURE2D_FORMAT
 	{
 		RGBA8_UNORM = 0
 	};
 
-	class Sampler
+	class Texture2D : public Resource
 	{
-	protected:
-
 	public:
-		virtual void PSSet(const unsigned int slot) const = 0;
-		virtual ~Sampler() = default;
-	};
-	class Texture2D
-	{
-	protected:
-
-	public:
-		virtual void PSSet(const unsigned int slot) const = 0;
 		virtual ~Texture2D() = default;
+		virtual void PSSet(unsigned int slot) = 0;
 	};
 }

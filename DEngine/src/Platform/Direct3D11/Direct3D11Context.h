@@ -17,14 +17,15 @@ namespace DEngine
 		ID3D11DepthStencilView* depthStencilView = nullptr;
 		ID3D11DepthStencilState* depthStencilState = nullptr;
 		ID3D11RasterizerState2* rasterizerState = nullptr;
-		D3D11_VIEWPORT viewport = { 0 };
-		DXGI_PRESENT_PARAMETERS presentParameters = { 0 };
+		D3D11_VIEWPORT viewport = { };
+		DXGI_PRESENT_PARAMETERS presentParameters = { };
 	public:
 		Direct3D11Context(const HWND& hWnd, unsigned short backBufferCount, unsigned short vsync);
 		~Direct3D11Context();
-		void ChangeRes(unsigned int width, unsigned int height) override;
+		void SetRes(unsigned int width, unsigned int height) override;
 		void Resize(unsigned int width, unsigned int height) override;
-		void ClearBackBuffer(Vector4 color, float depth, char stencil) override;
+		void ClearBackBuffer(const Vector4& color) override;
+		void ClearDepthBuffer(float depth) override;
 		void PresentFrame() override;
 		void Draw(unsigned int indicesCount) const override;
 
@@ -36,5 +37,10 @@ namespace DEngine
 		void CreateSwapChain(const HWND& hwnd);
 		void SetOMStates();
 		void SetViewport(float width, float height);
+	private:
+		static Direct3D11Context* s_GraphicsContext;
+	public:
+		static Direct3D11Context* Get();
+		static void Set(Direct3D11Context* gc);
 	};
 }
