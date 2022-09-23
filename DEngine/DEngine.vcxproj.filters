@@ -147,6 +147,9 @@
     <ClInclude Include="src\DEngine\ECS\EntityManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\DEngine\ECS\ComponentGroup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\Windows\WinWindow.cpp">
@@ -261,6 +264,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DEngine\ECS\EntityManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DEngine\ECS\ComponentGroup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

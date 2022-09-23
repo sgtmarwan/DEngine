@@ -115,7 +115,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\DEngine\ECS\ComponentGroup.h" />
     <ClInclude Include="src\DEngine\ECS\EntityManager.h" />
     <ClInclude Include="src\DEngine\ECS\ComponentPoll.h" />
     <ClInclude Include="src\DEngine\Graphics\GraphicsFactory.h" />
@@ -192,6 +193,7 @@
     <ClInclude Include="src\DEngine\Testing\TestMaterial.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\DEngine\ECS\ComponentGroup.cpp" />
     <ClCompile Include="src\DEngine\ECS\EntityManager.cpp" />
     <ClCompile Include="src\DEngine\ECS\ComponentPoll.cpp" />
     <ClCompile Include="src\DEngine\Graphics\GraphicsFactory.cpp" />
